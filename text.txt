@@ -1,0 +1,55 @@
+Sublime Text:
+Install the GPG key:
+
+sudo rpm -v --import https://download.sublimetext.com/sublimehq-rpm-pub.gpg
+Select the channel to use:
+
+Stable
+sudo dnf config-manager --add-repo https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
+Dev
+sudo dnf config-manager --add-repo https://download.sublimetext.com/rpm/dev/x86_64/sublime-text.repo
+Update dnf and install Sublime Text
+
+sudo dnf install sublime-text
+
+Git:
+
+sudo dnf install git-all
+
+
+
+
+#https://www.youtube.com/watch?v=DOHg16zcUCc
+
+#Dependencies:
+#Start Python 
+pip install pandas-datareader
+pip install matplotlib
+pip install pandas
+pip install numpy
+pip install datetime
+
+
+
+
+
+#!/usr/bin/pyhton
+from pandas_datareader import data
+from pandas_datareader._utils import RemoteDataError
+import matplotlib as plt
+import pandas as pd
+import numpy as np
+from datetime import datetime
+
+
+START_DATE = '2020-01-01'
+END_DATE = str(datetime.now().strftime('%Y-%m-%d')
+
+
+
+
+
+
+
+
+
