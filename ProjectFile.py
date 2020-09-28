@@ -20,21 +20,22 @@ import matplotlib.pyplot as pyplt
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
+import csv
 #
-print("Finished Imports")
-print("Define Variables")
+#print("Finished Imports")
+#print("Define Variables")
 #START_DATE = '2020-01-01'
-PastPrice = 90
+PastPrice = 28
 START_DATE = str((datetime.today()- timedelta(days=PastPrice)).strftime('%Y-%m-%d'))
 END_DATE = str(datetime.now().strftime('%Y-%m-%d'))
-print(START_DATE, END_DATE)
+#print(START_DATE, END_DATE)
 #UK_STOCK = 'BP'
-USA_STOCK = 'AMZN'
-#USA_STOCK = 'AAPL'
-#tickers = ['AAPL','BP']
+#USA_STOCK = 'AMZN'
+USA_STOCK = 'BP'
+tickers = ['AAPL','BP']
 #print(UK_STOCK, USA_STOCK)
 #print(tickers)
-
+period = -14
 
 def get_stats(stock_data):
     #print("***get_stats***")
@@ -65,23 +66,47 @@ def create_plot(stock_data, ticker):
 
 def get_data(ticker):
     #print("***get_data***")
-    print("Stock chosen:",ticker)
     try:
         stock_data = data.DataReader(ticker,'yahoo',START_DATE,END_DATE)
-        adj_close = clean_data(stock_data, 'Adj Close')
-        print(adj_close)
-        create_plot(adj_close, ticker)
+        adj_close = clean_data(stock_data,'Adj Close')
+        #print(adj_close)
+        #create_plot(adj_close, ticker)
         #print(stock_data)
+        # RSI = 100 - (100 /(1+RS))
+        #recent = adj_close[period:]
+        df = pd.DataFrame.from_dict(adj_close)
+        RSI_PERIOD = 14
+        chg = df['Adj Close'].diff(1)
+        #print(chg)
+        
+        gain = chg.mask(chg<0,0)
+        df['gain'] = gain
+        loss = chg.mask(chg>0,0)
+        df['loss'] = loss
+
+        avg_gain = gain.ewm(com=RSI_PERIOD-1,min_periods=RSI_PERIOD).mean()
+        avg_loss = loss.ewm(com=RSI_PERIOD-1,min_periods=RSI_PERIOD).mean()
+
+        RS = abs(avg_gain / avg_loss)
+
+        RSI = 100 - (100/(1+RS))
+
+        #df['RSI'] = RSI
+
+        #print(df)
+        #print(df[-1:])
+        print("Stock:",ticker,RSI[-1:])
+        #print(RSI[-1:])
+
 
     except RemoteDataError:
         print('No data found for {t}'.format(t=ticker))
 
-print("get_data has been set, running it now")
+#print("get_data has been set, running it now")
 
-get_data(USA_STOCK)
+#get_data(USA_STOCK)
 
-
-#for ticker in tickers:
-#    get_data(ticker)
+for ticker in tickers:
+    get_data(ticker)
 
 #end
