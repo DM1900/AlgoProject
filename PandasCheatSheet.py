@@ -28,5 +28,6 @@ CSV_FILE = datetime.now().strftime('output/PriceData_%Y%m%d.csv')
 print(CSV_FILE)
 
 stock_data = pd.read_csv(CSV_FILE)
-print(stock_data.head())
-#print(stock_data.describe())
+#print(stock_data.head())
+print(stock_data.describe())
+print(pd.value_counts(stock_data['AAPL']).plot.bar())
