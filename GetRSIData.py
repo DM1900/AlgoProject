@@ -13,32 +13,26 @@ pip install datetime
 """
 
 # imports:
+print("Load imports")
 from pandas_datareader import data
 from pandas_datareader._utils import RemoteDataError
 import matplotlib as plt
 import matplotlib.pyplot as pyplt
 import pandas as pd
 import numpy as np
+
 from datetime import datetime, timedelta
 import csv
-#
-#print("Finished Imports")
-#print("Define Variables")
-#START_DATE = '2020-01-01'
-PastPrice = 28
-START_DATE = str((datetime.today()- timedelta(days=PastPrice)).strftime('%Y-%m-%d'))
-END_DATE = str(datetime.now().strftime('%Y-%m-%d'))
-#print(START_DATE, END_DATE)
-#UK_STOCK = 'BP'
-#USA_STOCK = 'AMZN'
-USA_STOCK = 'BP'
-tickers = ['AAPL','BP','AMZN','BARC.L','RDSA.L']
-#print(UK_STOCK, USA_STOCK)
-#print(tickers)
-period = -14
 
+#
+print("Load variables")
+PriceHistory = 28 # no. of days data to gather
+START_DATE = str((datetime.today()- timedelta(days=PriceHistory)).strftime('%Y-%m-%d'))
+END_DATE = str(datetime.now().strftime('%Y-%m-%d'))
+
+tickers = ['AAPL']
+"""
 def get_stats(stock_data):
-    #print("***get_stats***")
     return {
         'last': np.mean(stock_data.tail(1)),
         'short_mean': np.mean(stock_data.tail(20)),
@@ -46,15 +40,13 @@ def get_stats(stock_data):
         'short_rolling': stock_data.rolling(window=20),
         'long_rolling': stock_data.rolling(window=200)
     }
-
+"""
 def clean_data(stock_data,col):
-    #print("***clean_data***")
     weekdays = pd.date_range(start=START_DATE, end=END_DATE)
     clean_data = stock_data[col].reindex(weekdays)
     return clean_data.fillna(method='ffill')
-
+"""
 def create_plot(stock_data, ticker):
-    #print("***create_plot***")
     stats = get_stats(stock_data)
     pyplt.subplots(figsize=(12,8))
     pyplt.plot(stock_data, label=ticker)
@@ -63,50 +55,83 @@ def create_plot(stock_data, ticker):
     pyplt.legend()
     pyplt.title('Stock ticker')
     pyplt.show()
+"""
 
-def get_data(ticker):
-    #print("***get_data***")
+
+def get_data1(ticker):
     try:
+        global df2
         stock_data = data.DataReader(ticker,'yahoo',START_DATE,END_DATE)
         adj_close = clean_data(stock_data,'Adj Close')
-        #print(adj_close)
-        #create_plot(adj_close, ticker)
-        #print(stock_data)
-        # RSI = 100 - (100 /(1+RS))
-        #recent = adj_close[period:]
         df = pd.DataFrame.from_dict(adj_close)
+        #print(df)
         RSI_PERIOD = 14
         chg = df['Adj Close'].diff(1)
-        #print(chg)
-        
         gain = chg.mask(chg<0,0)
-        df['gain'] = gain
         loss = chg.mask(chg>0,0)
-        df['loss'] = loss
-
+        #
         avg_gain = gain.ewm(com=RSI_PERIOD-1,min_periods=RSI_PERIOD).mean()
         avg_loss = loss.ewm(com=RSI_PERIOD-1,min_periods=RSI_PERIOD).mean()
-
+        #
         RS = abs(avg_gain / avg_loss)
-
         RSI = 100 - (100/(1+RS))
-
-        #df['RSI'] = RSI
-
-        #print(df)
-        #print(df[-1:])
-        print("Stock:",ticker,RSI[-1:])
-        #print(RSI[-1:])
-
+        RSI = RSI.tail(1)
+        df['Date'] = END_DATE
+        df['Ticker'] = ticker
+        df['RSI'] = RSI
+        df = (df[-1:])
+        df2 = df
 
     except RemoteDataError:
         print('No data found for {t}'.format(t=ticker))
 
 #print("get_data has been set, running it now")
 
-#get_data(USA_STOCK)
+for ticker in tickers:
+    get_data1(ticker)
+
+###
+
+tickerlist = "tickerfile.txt"
+with open(tickerlist) as file:
+    tickers = [ticker.rstrip('\n') for ticker in file]
+#tickers = ['AAPL','BP.L']
+
+def get_data(ticker):
+    try:
+        global df
+        global df2
+        #global df3
+        stock_data = data.DataReader(ticker,'yahoo',START_DATE,END_DATE)
+        adj_close = clean_data(stock_data,'Adj Close')
+        df = pd.DataFrame.from_dict(adj_close)
+        #print(df)
+        RSI_PERIOD = 14
+        chg = df['Adj Close'].diff(1)
+        gain = chg.mask(chg<0,0)
+        loss = chg.mask(chg>0,0)
+        #
+        avg_gain = gain.ewm(com=RSI_PERIOD-1,min_periods=RSI_PERIOD).mean()
+        avg_loss = loss.ewm(com=RSI_PERIOD-1,min_periods=RSI_PERIOD).mean()
+        #
+        RS = abs(avg_gain / avg_loss)
+        RSI = 100 - (100/(1+RS))
+        RSI = RSI.tail(1)
+        df['Date'] = END_DATE
+        df['Ticker'] = ticker
+        df['RSI'] = RSI
+        df = (df[-1:])
+        df2 = df2.append(df)
+
+    except RemoteDataError:
+        print('No data found for {t}'.format(t=ticker))
+
+#print("get_data has been set, running it now")
 
 for ticker in tickers:
     get_data(ticker)
 
-#end
+print(df2)
+
+CSV_FILE = datetime.now().strftime('output/RSIData_%Y%m%d.csv')
+df2.to_csv(CSV_FILE,index=False)
