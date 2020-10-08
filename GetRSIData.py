@@ -92,7 +92,6 @@ for ticker in tickers:
 
 ###
 
-
 tickerlist = "tickerfile.txt"
 with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
@@ -102,7 +101,7 @@ def get_data(ticker):
     try:
         global df
         global df2
-        global df3
+        #global df3
         stock_data = data.DataReader(ticker,'yahoo',START_DATE,END_DATE)
         adj_close = clean_data(stock_data,'Adj Close')
         df = pd.DataFrame.from_dict(adj_close)
@@ -133,3 +132,6 @@ for ticker in tickers:
     get_data(ticker)
 
 print(df2)
+
+CSV_FILE = datetime.now().strftime('output/RSIData_%Y%m%d.csv')
+df2.to_csv(CSV_FILE,index=False)
