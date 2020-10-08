@@ -29,10 +29,8 @@ print("Load variables")
 PriceHistory = 28 # no. of days data to gather
 START_DATE = str((datetime.today()- timedelta(days=PriceHistory)).strftime('%Y-%m-%d'))
 END_DATE = str(datetime.now().strftime('%Y-%m-%d'))
-tickerlist = "tickerfile.txt"
-with open(tickerlist) as file:
-    tickers = [ticker.rstrip('\n') for ticker in file]
-tickers = ['AAPL']#,'AMZN','BP.L']
+
+tickers = ['AAPL']
 """
 def get_stats(stock_data):
     return {
@@ -58,14 +56,11 @@ def create_plot(stock_data, ticker):
     pyplt.title('Stock ticker')
     pyplt.show()
 """
-#df2 = pd.DataFrame()
-df2 = pd.DataFrame(columns = ['Adj Close', 'Date', 'Ticker','RSI']) 
-print(df2)
 
-def get_data(ticker):
-    print(ticker)
-    print("gap")
+
+def get_data1(ticker):
     try:
+        global df2
         stock_data = data.DataReader(ticker,'yahoo',START_DATE,END_DATE)
         adj_close = clean_data(stock_data,'Adj Close')
         df = pd.DataFrame.from_dict(adj_close)
@@ -85,20 +80,49 @@ def get_data(ticker):
         df['Ticker'] = ticker
         df['RSI'] = RSI
         df = (df[-1:])
-        print("df is:")
-        print(df)
-        #df = pd.DataFrame({"a":[0],"b":[ticker],"c":[RSI]})
-        print("df2 is:")
-        df2.append(df, ignore_index=True)
-        print(df2)
-        
-        #CSV_FILE = datetime.now().strftime('output/RSIData_%Y%m%d.csv')
-        #df.to_csv(CSV_FILE,index=False)
-        #to_clipboard(excel=True,sep=None)
-        #print(NEW_DATA)
-        #f = open("newfile.txt", "a")
-        #f.write(NEW_DATA)
-        #f.close
+        df2 = df
+
+    except RemoteDataError:
+        print('No data found for {t}'.format(t=ticker))
+
+#print("get_data has been set, running it now")
+
+for ticker in tickers:
+    get_data1(ticker)
+
+###
+
+
+tickerlist = "tickerfile.txt"
+with open(tickerlist) as file:
+    tickers = [ticker.rstrip('\n') for ticker in file]
+#tickers = ['AAPL','BP.L']
+
+def get_data(ticker):
+    try:
+        global df
+        global df2
+        global df3
+        stock_data = data.DataReader(ticker,'yahoo',START_DATE,END_DATE)
+        adj_close = clean_data(stock_data,'Adj Close')
+        df = pd.DataFrame.from_dict(adj_close)
+        #print(df)
+        RSI_PERIOD = 14
+        chg = df['Adj Close'].diff(1)
+        gain = chg.mask(chg<0,0)
+        loss = chg.mask(chg>0,0)
+        #
+        avg_gain = gain.ewm(com=RSI_PERIOD-1,min_periods=RSI_PERIOD).mean()
+        avg_loss = loss.ewm(com=RSI_PERIOD-1,min_periods=RSI_PERIOD).mean()
+        #
+        RS = abs(avg_gain / avg_loss)
+        RSI = 100 - (100/(1+RS))
+        RSI = RSI.tail(1)
+        df['Date'] = END_DATE
+        df['Ticker'] = ticker
+        df['RSI'] = RSI
+        df = (df[-1:])
+        df2 = df2.append(df)
 
     except RemoteDataError:
         print('No data found for {t}'.format(t=ticker))
@@ -108,4 +132,4 @@ def get_data(ticker):
 for ticker in tickers:
     get_data(ticker)
 
-#end
+print(df2)
