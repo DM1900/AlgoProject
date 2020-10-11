@@ -32,7 +32,7 @@ tickerlist = "tickerfile.txt"
 with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
 #tickers = ['AAPL','AMZN','BP.L']
-tickers = ['BRKB']
+#tickers = ['BRKB']
 
 def clean_data(stock_data,col1):
     weekdays = pd.date_range(start=START_DATE, end=END_DATE)

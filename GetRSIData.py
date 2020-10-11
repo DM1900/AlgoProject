@@ -64,11 +64,9 @@ def get_data(ticker):
     try:
         global df
         global df2
-        #global df3
         stock_data = data.DataReader(ticker,'yahoo',START_DATE,END_DATE)
         adj_close = clean_data(stock_data,'Adj Close')
         df = pd.DataFrame.from_dict(adj_close)
-        #print(df)
         chg = df['Adj Close'].diff(1)
         gain = chg.mask(chg<0,0)
         loss = chg.mask(chg>0,0)
