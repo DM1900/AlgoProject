@@ -20,7 +20,6 @@ import matplotlib as plt
 import matplotlib.pyplot as pyplt
 import pandas as pd
 import numpy as np
-
 from datetime import datetime, timedelta
 import csv
 
@@ -33,6 +32,7 @@ tickerlist = "tickerfile.txt"
 with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
 #tickers = ['AAPL','AMZN','BP.L']
+tickers = ['BRKB']
 
 def clean_data(stock_data,col1):
     weekdays = pd.date_range(start=START_DATE, end=END_DATE)
@@ -41,7 +41,7 @@ def clean_data(stock_data,col1):
 
 stock_data = data.DataReader(tickers,'yahoo',START_DATE,END_DATE)
 stock_data = clean_data(stock_data,'Adj Close')
-#print(stock_data.tail(2))
+#print(stock_data.tail(14))
 
 CSV_FILE = datetime.now().strftime('output/PriceData_%Y%m%d.csv')
 stock_data.tail(24).to_csv(CSV_FILE,index=False)
