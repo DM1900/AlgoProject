@@ -1,15 +1,11 @@
-
-# imports:
-print("Load imports")
-from pandas_datareader import data
-from pandas_datareader._utils import RemoteDataError
-import matplotlib as plt
-import matplotlib.pyplot as pyplt
 import pandas as pd
 import numpy as np
-from datetime import datetime, timedelta
-import csv
 
+np.random.seed(24)
+df = pd.DataFrame({'A': np.linspace(1, 10, 10)})
+df = pd.concat([df, pd.DataFrame(np.random.randn(10, 4), columns=list('BCDE'))],
+               axis=1)
+df.iloc[3, 3] = np.nan
+df.iloc[0, 2] = np.nan
 
-
-pip install yahoo-finance
+print(df.style)

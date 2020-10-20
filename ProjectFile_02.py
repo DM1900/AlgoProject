@@ -2,15 +2,13 @@
 
 #https://www.youtube.com/watch?v=DOHg16zcUCc
 
-"""
 #Dependencies:
 #Start Python 
-pip install pandas-datareader
-pip install matplotlib
-pip install pandas
-pip install numpy
-pip install datetime
-"""
+#pip install pandas-datareader
+#pip install matplotlib
+#pip install pandas
+#pip install numpy
+#pip install datetime
 
 # imports:
 print("Load imports")
@@ -33,7 +31,7 @@ tickerlist = "tickerfile.txt"
 with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
 tickers = ['AAPL','AMZN']
-"""
+
 def get_stats(stock_data):
     return {
         'last': np.mean(stock_data.tail(1)),
@@ -42,12 +40,12 @@ def get_stats(stock_data):
         'short_rolling': stock_data.rolling(window=20),
         'long_rolling': stock_data.rolling(window=200)
     }
-"""
+
 def clean_data(stock_data,col):
     weekdays = pd.date_range(start=START_DATE, end=END_DATE)
     clean_data = stock_data[col].reindex(weekdays)
     return clean_data.fillna(method='ffill')
-"""
+
 def create_plot(stock_data, ticker):
     stats = get_stats(stock_data)
     pyplt.subplots(figsize=(12,8))
@@ -57,7 +55,7 @@ def create_plot(stock_data, ticker):
     pyplt.legend()
     pyplt.title('Stock ticker')
     pyplt.show()
-"""
+
 def get_data(ticker):
     try:
         stock_data = data.DataReader(ticker,'yahoo',START_DATE,END_DATE)
@@ -79,7 +77,7 @@ def get_data(ticker):
         df['RSI'] = RSI
         df = (df[-1:])
         FINALDATA = df['Date'],df['Ticker'],df['RSI']
-        print(FINALDATA)
+        #print(FINALDATA)
         #print("Stock:",ticker,RSI[-1:])
         #CSV_FILE = "output/csvfile_20201003.csv"
         #df.to_csv(CSV_FILE,index=False)
@@ -92,7 +90,7 @@ def get_data(ticker):
     except RemoteDataError:
         print('No data found for {t}'.format(t=ticker))
 
-#print("get_data has been set, running it now")
+print("get_data has been set, running it now")
 
 for ticker in tickers:
     get_data(ticker)

@@ -2,15 +2,13 @@
 
 #https://www.youtube.com/watch?v=DOHg16zcUCc
 
-"""
 #Dependencies:
 #Start Python 
-pip install pandas-datareader
-pip install matplotlib
-pip install pandas
-pip install numpy
-pip install datetime
-"""
+#pip install pandas-datareader
+#pip install matplotlib
+#pip install pandas
+#pip install numpy
+#pip install datetime
 
 # imports:
 print("Load imports")
@@ -32,7 +30,7 @@ tickerlist = "tickerfile.txt"
 with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
 #tickers = ['AAPL','AMZN','BP.L']
-#tickers = ['BRKB']
+#tickers = ['MKS.L']
 
 def clean_data(stock_data,col1):
     weekdays = pd.date_range(start=START_DATE, end=END_DATE)
@@ -43,8 +41,11 @@ stock_data = data.DataReader(tickers,'yahoo',START_DATE,END_DATE)
 stock_data = clean_data(stock_data,'Adj Close')
 #print(stock_data.tail(14))
 
-CSV_FILE = datetime.now().strftime('output/PriceData_%Y%m%d.csv')
-stock_data.tail(24).to_csv(CSV_FILE,index=False)
+def write_csv():
+    CSV_FILE = datetime.now().strftime('output/PriceData_%Y%m%d.csv')
+    stock_data.tail(24).to_csv(CSV_FILE,index=False)
+
+write_csv()
 
 #data = pd.read_csv(CSV_FILE)
 #print(data)

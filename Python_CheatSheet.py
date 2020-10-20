@@ -115,3 +115,29 @@ print(res)
 
 res + res
 
+
+
+#Boolean Operators
+#The not Operation
+#Sometimes we want to know the opposite boolean value for something. To do this, we use the unary operators not:
+
+not True
+not False
+
+#The or Operation
+#The boolean or operator works the same way that the bitwise OR operator did if we are only considering one bit. The bit of 1 is equivalent to True and 0 is equivalent to False
+
+True or True
+True or False
+
+False or False
+False or True
+
+#The and Operation
+#The and operator is the opposite of or, and both of the operands need to be true.
+
+True and True
+True and False
+
+False and False
+False and True

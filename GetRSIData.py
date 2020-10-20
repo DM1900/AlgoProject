@@ -30,7 +30,8 @@ END_DATE = str(datetime.now().strftime('%Y-%m-%d'))
 tickerlist = "tickerfile.txt"
 with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
-#tickers = ['AAPL','AMZN','BP.L','V','VHYL.L','UKDV.L','BRKB']
+#tickers = ['AAPL','AMZN','BP.L','V','VHYL.L','BRKB']
+#tickers = ['UKDV.L']
 # create empty dataframe
 df2 = pd.DataFrame(columns=[])#'Adj Close', 'Date', 'Ticker','RSI'
 
@@ -62,6 +63,7 @@ def create_plot(stock_data, ticker):
 
 def get_data(ticker):
     try:
+        print(ticker)
         global df
         global df2
         stock_data = data.DataReader(ticker,'yahoo',START_DATE,END_DATE)
@@ -77,7 +79,7 @@ def get_data(ticker):
         RS = abs(avg_gain / avg_loss)
         RSI = 100 - (100/(1+RS))
         RSI = RSI.tail(1)
-        df['Date'] = END_DATE
+        #df['Date'] = END_DATE
         df['Ticker'] = ticker
         df['RSI'] = RSI
         df = (df[-1:])
@@ -91,7 +93,9 @@ def get_data(ticker):
 for ticker in tickers:
     get_data(ticker)
 
-print(df2.sort_values(by=['RSI'], na_position='last'))
+df2 = df2.sort_values(by=['RSI'], na_position='last')
 
-#CSV_FILE = datetime.now().strftime('output/RSIData_%Y%m%d.csv')
-#df2.to_csv(CSV_FILE,index=False)
+print(df2)
+
+CSV_FILE = datetime.now().strftime('output/RSIData_%Y%m%d.csv')
+df2.to_csv(CSV_FILE,index=False)
