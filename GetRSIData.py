@@ -63,7 +63,7 @@ def create_plot(stock_data, ticker):
 
 def get_data(ticker):
     try:
-        print(ticker)
+        #print(ticker)
         global df
         global df2
         stock_data = data.DataReader(ticker,'yahoo',START_DATE,END_DATE)
@@ -88,8 +88,7 @@ def get_data(ticker):
     except RemoteDataError:
         print('No data found for {t}'.format(t=ticker))
 
-#print("get_data has been set, running it now")
-
+print("get_data has been set, running it now...")
 for ticker in tickers:
     get_data(ticker)
 
