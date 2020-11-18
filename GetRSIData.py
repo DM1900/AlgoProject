@@ -1,14 +1,6 @@
 #!/usr/bin/python
 #https://www.youtube.com/watch?v=DOHg16zcUCc
-"""
-#Dependencies:
-#Start Python 
-pip install pandas-datareader
-pip install matplotlib
-pip install pandas
-pip install numpy
-pip install datetime
-"""
+
 # imports:
 print("Load imports")
 from pandas_datareader import data
@@ -27,43 +19,22 @@ RSI_PERIOD = 14 # no. of days to calculate RSI
 ###
 START_DATE = str((datetime.today()- timedelta(days=PriceHistory)).strftime('%Y-%m-%d'))
 END_DATE = str(datetime.now().strftime('%Y-%m-%d'))
-tickerlist = "tickerfile.txt"
+tickerlist = "tickers/tickerfile.txt"
+#tickerlist = "tickers/tickerfile_TEST.txt"
 with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
-#tickers = ['AAPL','AMZN','BP.L','V','VHYL.L','BRKB']
-#tickers = ['UKDV.L']
+#tickers = ['AAPL','AMZN','BP.L','V','VHYL.L','BRKB','UKDV.L']
 # create empty dataframe
 df2 = pd.DataFrame(columns=[])#'Adj Close', 'Date', 'Ticker','RSI'
 
-"""
-def get_stats(stock_data):
-    return {
-        'last': np.mean(stock_data.tail(1)),
-        'short_mean': np.mean(stock_data.tail(20)),
-        'long_mean': np.mean(stock_data.tail(200)),
-        'short_rolling': stock_data.rolling(window=20),
-        'long_rolling': stock_data.rolling(window=200)
-    }
-"""
 def clean_data(stock_data,col):
     weekdays = pd.date_range(start=START_DATE, end=END_DATE)
     clean_data = stock_data[col].reindex(weekdays)
     return clean_data.fillna(method='ffill')
-"""
-def create_plot(stock_data, ticker):
-    stats = get_stats(stock_data)
-    pyplt.subplots(figsize=(12,8))
-    pyplt.plot(stock_data, label=ticker)
-    pyplt.xlabel('Date')
-    pyplt.ylabel('Adj Close (p)')
-    pyplt.legend()
-    pyplt.title('Stock ticker')
-    pyplt.show()
-"""
 
 def get_data(ticker):
     try:
-        #print(ticker)
+        print(ticker)
         global df
         global df2
         stock_data = data.DataReader(ticker,'yahoo',START_DATE,END_DATE)
@@ -84,6 +55,7 @@ def get_data(ticker):
         df['RSI'] = RSI
         df = (df[-1:])
         df2 = df2.append(df)
+        print("success on " + ticker)
 
     except RemoteDataError:
         print('No data found for {t}'.format(t=ticker))
@@ -98,3 +70,4 @@ print(df2)
 
 CSV_FILE = datetime.now().strftime('output/RSIData_%Y%m%d.csv')
 df2.to_csv(CSV_FILE,index=False)
+#end
