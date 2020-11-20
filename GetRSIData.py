@@ -55,8 +55,7 @@ def get_data(ticker):
         df['RSI'] = RSI
         df = (df[-1:])
         df2 = df2.append(df)
-        print("success on " + ticker)
-
+        print("success on " + ticker)# + ", RSI is " + RSI)
     except RemoteDataError:
         print('No data found for {t}'.format(t=ticker))
 
