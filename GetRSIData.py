@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 import csv
 
 ###
+print(datetime.now())
 print("Load variables")
 PriceHistory = 180 # no. of days data to gather
 RSI_PERIOD = 14 # no. of days to calculate RSI
@@ -69,4 +70,7 @@ print(df2)
 
 CSV_FILE = datetime.now().strftime('output/RSIData_%Y%m%d.csv')
 df2.to_csv(CSV_FILE,index=False)
+
+print(datetime.now())
+
 #end

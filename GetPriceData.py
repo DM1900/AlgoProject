@@ -30,7 +30,7 @@ tickerlist = "tickers/tickerfile.txt"
 #tickerlist = "tickers/tickerfile_TEST.txt"
 with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
-tickers = ['AAPL','AMZN','BP.L']
+#tickers = ['AAPL','AMZN','BP.L']
 #tickers = ['MKS.L']
 
 def clean_data(stock_data,col1):
