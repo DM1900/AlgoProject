@@ -1,5 +1,13 @@
 
 
-ticker = "AAL"
-RSI = "200.1152"
-print("success on " + ticker + ", RSI is " + RSI)
+
+
+CLOSE = 1
+OPEN = 2
+
+
+
+if CLOSE > OPEN:
+    print("BUY")
+else:
+    print("SELL")

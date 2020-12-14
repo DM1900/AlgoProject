@@ -27,7 +27,7 @@ PriceHistory = 28 # no. of days data to gather
 START_DATE = str((datetime.today()- timedelta(days=PriceHistory)).strftime('%Y-%m-%d'))
 END_DATE = str(datetime.now().strftime('%Y-%m-%d'))
 tickerlist = "tickers/tickerfile.txt"
-#tickerlist = "tickers/tickerfile_TEST.txt"
+tickerlist = "tickers/tickerfile_TRADELIST.txt"
 with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
 #tickers = ['AAPL','AMZN','BP.L']

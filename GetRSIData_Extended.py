@@ -13,10 +13,13 @@ from datetime import datetime, timedelta
 import csv
 
 ###
-print(datetime.now())
+#print(datetime.now())
 print("Load variables")
 PriceHistory = 180 # no. of days data to gather
 RSI_PERIOD = 14 # no. of days to calculate RSI
+RSILOW = 45
+RSIHIGH = 65
+HOLD = "-"
 ###
 START_DATE = str((datetime.today()- timedelta(days=PriceHistory)).strftime('%Y-%m-%d'))
 END_DATE = str(datetime.now().strftime('%Y-%m-%d'))
@@ -24,7 +27,7 @@ tickerlist = "tickers/tickerfile.txt"
 tickerlist = "tickers/tickerfile_TRADELIST.txt"
 with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
-#tickers = ['AAPL','AMZN','BP.L','V','VHYL.L','BRKB','UKDV.L']
+#tickers = ['AAPL','AMZN']#,'BP.L','V','VHYL.L','BRKB','UKDV.L']
 # create empty dataframe
 df2 = pd.DataFrame(columns=[])#'Adj Close', 'Date', 'Ticker','RSI'
 
@@ -39,24 +42,44 @@ def get_data(ticker):
         global df
         global df2
         stock_data = data.DataReader(ticker,'yahoo',START_DATE,END_DATE)
-        adj_close = clean_data(stock_data,'Adj Close')
+        adj_close = round(clean_data(stock_data,'Adj Close'),2)
         df = pd.DataFrame.from_dict(adj_close)
+        OPEN = round(stock_data.Open.tail(1),2)
+        df['Open'] = OPEN
+        #CLOSE = stock_data.Close.tail(1)
+        #df['Close'] = CLOSE
         chg = df['Adj Close'].diff(1)
+        #
         gain = chg.mask(chg<0,0)
         loss = chg.mask(chg>0,0)
-        #
         avg_gain = gain.ewm(com=RSI_PERIOD-1,min_periods=RSI_PERIOD).mean()
         avg_loss = loss.ewm(com=RSI_PERIOD-1,min_periods=RSI_PERIOD).mean()
-        #
         RS = abs(avg_gain / avg_loss)
         RSI = 100 - (100/(1+RS))
-        RSI = RSI.tail(1)
+        RSI = round(RSI.tail(1),2)
         #df['Date'] = END_DATE
-        df['Ticker'] = ticker
         df['RSI'] = RSI
+        df['Ticker'] = ticker
+        OPEN = df[-1:].iat[0,1]
+        CLOSE = df[-1:].iat[0,0]
+        RSI = df[-1:].iat[0,2]
+        if RSI > RSIHIGH:
+            if CLOSE < OPEN:
+                print("BUY")
+                df['Suggestion'] = "SELL"
+            else:
+                df['Suggestion'] = HOLD
+        elif RSI < RSILOW:
+            if CLOSE > OPEN:
+                print("BUY")
+                df['Suggestion'] = "BUY"
+            else:
+                df['Suggestion'] = HOLD
+        else:
+            df['Suggestion'] = HOLD
         df = (df[-1:])
         df2 = df2.append(df)
-        print("success on " + ticker)# + ", RSI is " + RSI)
+        #print("success on " + ticker)# + ", RSI is " + RSI)
     except RemoteDataError:
         print('No data found for {t}'.format(t=ticker))
 
@@ -64,13 +87,13 @@ print("get_data has been set, running it now...")
 for ticker in tickers:
     get_data(ticker)
 
-#df2 = df2.sort_values(by=['RSI'], na_position='last')
+#df2 = df2.sort_values(by=['Suggestion'], na_position='last')
 
-print(df2)
+print(df2.tail(5))
 
-CSV_FILE = datetime.now().strftime('output/RSIData_%Y%m%d.csv')
+CSV_FILE = datetime.now().strftime('output/RSIData_Extended_%Y%m%d.csv')
 df2.to_csv(CSV_FILE,index=False)
 
-print(datetime.now())
+#print(datetime.now())
 
 #end
