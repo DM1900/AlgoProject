@@ -5,6 +5,7 @@
 """
 #Dependencies:
 #Start Python 
+py -m ...
 pip install pandas-datareader
 pip install matplotlib
 pip install pandas

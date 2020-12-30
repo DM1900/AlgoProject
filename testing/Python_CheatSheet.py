@@ -2,6 +2,9 @@
 """
 https://docs.python.org/3.8/
 """
+# install a package:
+#https://pip.pypa.io/en/stable/reference/pip_install/
+py -m pip install alpha_vantage
 
 # numbers
 a = 1
