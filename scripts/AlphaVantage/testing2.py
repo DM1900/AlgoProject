@@ -1,41 +1,40 @@
 print("Start")
 print("Load packages")
-#from alpha_vantage.timeseries import TimeSeries
-from alpha_vantage import TimeSeries
-print("Get API Key")
+import pandas
+from alpha_vantage.timeseries import TimeSeries
+import sys
+import random
+import time
 
-#lines = open('keys.txt').read().splitlines()
-#APIkey = random.choice(lines)
-print(APIkey)
-YOUR_API_KEY = "T36W24357QF5Z698"
-ts = TimeSeries(key='YOUR_API_KEY')
-gq = GLOBAL_QUOTE(key='YOUR_API_KEY')
-# Get json object with the intraday data and another with  the call's metadata
-#data, meta_data = ts.get_intraday('AAPL')
-#print("Print Data")
-#print(data.tail(4))
-
-TICKER = ['AAPL']
-#TICKER = ['LON:BP.L']
-#TICKER = ['BMW.FRK']
+#variables
+WAITTIME = 3
 
 
+tickerlist = "tickers/AV/tickerfile_TRADELIST.txt"
+tickerlist = "tickers/AV/tickerfile_TEST.txt"
+tickerlist = "tickers/AV/tickerfile_TEST_USA.txt"
+with open(tickerlist) as file:
+    tickers = [ticker.rstrip('\n') for ticker in file]
 
+def GetAPIkey():
+    print("Get API Key")
+    keys = "scripts/AlphaVantage/keys.txt"
+    lines = open(keys).read().splitlines()
+    global APIkey
+    APIkey = random.choice(lines)
 
+def get_data(ticker):
+    print(ticker)
+    GetAPIkey() # get a new API key each time the script runs
+    ts = TimeSeries(key=APIkey, output_format='pandas')
+    data, meta_data = ts.get_quote_endpoint(symbol=ticker);
+    print(data)
+    print("wait...")
+    time.sleep(WAITTIME)
 
-
-
-print('Ticker: {t}'.format(t=TICKER))
-
-gq = GLOBAL_QUOTE
-
-
-
-#ts = TimeSeries(key='YOUR_API_KEY', output_format='pandas')
-#data, meta_data = ts.get_intraday(symbol=TICKER)
-#TEST = ts.global(symbol=TICKER)
-#print(data.head(2))
-
+print("get_data has been set, running it now...")
+for ticker in tickers:
+    get_data(ticker)
 
 
 #https://www.alphavantage.co/query?function=TimeSeries&symbol=LON:BP.L&apikey=T36W24357QF5Z698

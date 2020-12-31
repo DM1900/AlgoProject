@@ -25,10 +25,12 @@ START_DATE = str((datetime.today()- timedelta(days=PriceHistory)).strftime('%Y-%
 END_DATE = str(datetime.now().strftime('%Y-%m-%d'))
 tickerlist = "tickers/tickerfile.txt"
 tickerlist = "tickers/tickerfile_TRADELIST.txt"
+tickerlist = "tickers/tickerfile_TEST.txt"
+#tickerlist = "tickers/tickerfile_TEST_UK.txt"
+#tickerlist = "tickers/tickerfile_TEST_USA.txt"
 with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
-#tickers = ['AAPL','AMZN']#,'BP.L','V','VHYL.L','BRKB','UKDV.L']
-#tickers = ['BP.L','ULVR.L']
+    
 # create empty dataframe
 df2 = pd.DataFrame(columns=[])#'Adj Close', 'Date', 'Ticker','RSI'
 
