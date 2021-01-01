@@ -27,7 +27,7 @@ WAITTIME = 3
 
 tickerlist = "tickers/AV/tickerfile_TRADELIST.txt"
 tickerlist = "tickers/AV/tickerfile_TEST.txt"
-tickerlist = "tickers/AV/tickerfile_TEST_USA.txt"
+#tickerlist = "tickers/AV/tickerfile_TEST_USA.txt"
 with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
 
@@ -38,7 +38,7 @@ def GetAPIkey(): # get a new API key each time the script runs
     global APIkey
     APIkey = random.choice(lines)
 
-df = pd.DataFrame(columns=[])   # create empty dataframe
+#df = pd.DataFrame(columns=[])   # create empty dataframe
 df2 = pd.DataFrame(columns=[])  # create empty dataframe
 
 def get_data(ticker):
@@ -49,45 +49,45 @@ def get_data(ticker):
     GetAPIkey() # get a new API key each time the script runs
     ts = TimeSeries(key=APIkey, output_format='pandas')
     data = ts.get_quote_endpoint(symbol=ticker)#;
-    print(data)
+    #print("PRINT data")
+    #print(data)
     TEMPdf = df.append(data)
-    T0 = TEMPdf.iat[0,0]
-    print("Print the output of 0,0")
-    print(T0)
-    exit
-    print("Print TEMPdf")
-    print(TEMPdf)
-    TEMPdf = TEMPdf.drop(['02. open','03. high','04. low','06. volume','07. latest trading day'], axis=1)
-    RS = 99
-    TEMPdf['RSI'] = RS
-    print("Print TEMPdf")
-    print(TEMPdf)
-    PRICE = TEMPdf[-1:].iat[0,1]
-    CLOSE = TEMPdf[-1:].iat[0,2]
+    #print("Print TEMPdf")
+    #print(TEMPdf)
+    DTICKER = TEMPdf.iat[0,0]
+    df = df.append({'Ticker':DTICKER}, ignore_index=True)
+    #df['Ticker'] = DTICKER
+    DPRICE = TEMPdf.iat[0,4]
+    df['Price'] = DPRICE
+    DCLOSE = TEMPdf.iat[0,7]
+    df['PreviousClose'] = DCLOSE
+    RS = 99 # this needs to be scripted correctly
+    df['RSI'] = RS
     if RS > RSIHIGH:
-        if CLOSE < PRICE:
-            print("BUY")
-            TEMPdf['Suggestion'] = "SELL"
+        if DCLOSE < DPRICE:
+            #print("BUY")
+            df['Suggestion'] = "SELL"
         else:
-            TEMPdf['Suggestion'] = HOLD
+            df['Suggestion'] = HOLD
     elif RS < RSILOW:
-        if CLOSE > PRICE:
-            print("BUY")
-            TEMPdf['Suggestion'] = "BUY"
+        if CLOSE > DPRICE:
+            #print("BUY")
+            df['Suggestion'] = "BUY"
         else:
-            TEMPdf['Suggestion'] = HOLD
+            df['Suggestion'] = HOLD
     else:
-        TEMPdf['Suggestion'] = HOLD
-    print(TEMPdf)
-    df2 = df2.append(TEMPdf)
-    print("wait...")
+        df['Suggestion'] = HOLD
+    #print("Print 'df'")
+    #print(df)
+    df2 = df2.append(df)
+    #print("wait...")
     time.sleep(WAITTIME)
 
 print("get_data has been set, running it now...")
 for ticker in tickers:
     get_data(ticker)
 
-print("df2")
+print("PRINT df2")
 print(df2)
 #print(df2.tail(5))
 
