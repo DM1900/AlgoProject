@@ -5,7 +5,7 @@ import pandas as pd
 from pandas_datareader import data
 from pandas_datareader._utils import RemoteDataError
 from alpha_vantage.timeseries import TimeSeries
-#from alpha_vantage.techindicators import 
+from alpha_vantage.techindicators import TechIndicators 
 import sys
 import random
 import time
@@ -17,6 +17,7 @@ print(datetime.now())
 print("Load variables")
 PriceHistory = 180 # no. of days data to gather
 RSI_PERIOD = 14 # no. of days to calculate RSI
+RSI_INT = 'daily' # interval to calculate RSI
 RSILOW = 45
 RSIHIGH = 65
 HOLD = "-"
@@ -37,8 +38,8 @@ def GetAPIkey(): # get a new API key each time the script runs
     lines = open(keys).read().splitlines()
     global APIkey
     APIkey = random.choice(lines)
+    #print(APIkey)
 
-#df = pd.DataFrame(columns=[])   # create empty dataframe
 df2 = pd.DataFrame(columns=[])  # create empty dataframe
 
 def get_data(ticker):
@@ -49,38 +50,37 @@ def get_data(ticker):
     GetAPIkey() # get a new API key each time the script runs
     ts = TimeSeries(key=APIkey, output_format='pandas')
     data = ts.get_quote_endpoint(symbol=ticker)#;
-    #print("PRINT data")
-    #print(data)
     TEMPdf = df.append(data)
-    #print("Print TEMPdf")
-    #print(TEMPdf)
     DTICKER = TEMPdf.iat[0,0]
     df = df.append({'Ticker':DTICKER}, ignore_index=True)
-    #df['Ticker'] = DTICKER
     DPRICE = TEMPdf.iat[0,4]
     df['Price'] = DPRICE
     DCLOSE = TEMPdf.iat[0,7]
     df['PreviousClose'] = DCLOSE
-    RS = 99 # this needs to be scripted correctly
+    TEMPdf = pd.DataFrame()   # create empty dataframe
+    # get RSI data using a new VA API key
+    GetAPIkey() # get a new API key each time the script runs
+    ti = TechIndicators(key=APIkey, output_format='pandas')
+    dataRSI = ti.get_rsi(symbol=ticker,interval=RSI_INT, time_period=RSI_PERIOD)
+    dataRSI = dataRSI[0]
+    TEMPdf = TEMPdf.append(dataRSI)
+    RS = TEMPdf.last('1D')
+    RS = RS.iat[0,0]
     df['RSI'] = RS
-    if RS > RSIHIGH:
-        if DCLOSE < DPRICE:
-            #print("BUY")
+    if RS > RSIHIGH: # suggest buy/sell based on RSI & price action
+        if DCLOSE > DPRICE:
             df['Suggestion'] = "SELL"
         else:
             df['Suggestion'] = HOLD
     elif RS < RSILOW:
-        if CLOSE > DPRICE:
-            #print("BUY")
+        if DCLOSE < DPRICE:
             df['Suggestion'] = "BUY"
         else:
             df['Suggestion'] = HOLD
     else:
         df['Suggestion'] = HOLD
-    #print("Print 'df'")
-    #print(df)
     df2 = df2.append(df)
-    #print("wait...")
+    print("wait...")
     time.sleep(WAITTIME)
 
 print("get_data has been set, running it now...")
@@ -93,3 +93,5 @@ print(df2)
 
 #https://www.alphavantage.co/query?function=TimeSeries&symbol=LON:BP.L&apikey=T36W24357QF5Z698
 #https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=LON:BP.L&apikey=T36W24357QF5Z698
+#https://www.alphavantage.co/query?function=RSI&symbol=AAPL&interval=daily&time_period=14&series_type=CLOSE&apikey=T36W24357QF5Z698
+

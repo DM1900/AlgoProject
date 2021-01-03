@@ -9,7 +9,7 @@ import time
 #variables
 WAITTIME = 3
 
-
+print
 tickerlist = "tickers/AV/tickerfile_TRADELIST.txt"
 tickerlist = "tickers/AV/tickerfile_TEST.txt"
 tickerlist = "tickers/AV/tickerfile_TEST_USA.txt"
