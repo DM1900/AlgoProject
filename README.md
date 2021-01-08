@@ -3,7 +3,7 @@ Algorithm Project
 ===
 
 ## Data
-####Scripts ready to run:  
+#### Scripts ready to run:  
 * Get data script
 * Get RSI data
 * Get RSI data + buy/sell  
