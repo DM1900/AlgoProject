@@ -1,4 +1,8 @@
 #!/usr/bin/python
+# DerekM - 2021
+# The data is gathered from Alpha Vantage which has a delay of 1 day on all stock data.
+# Please factor that into any tradng decisions (this is based on Daily RSI so it's not such a big issue here)
+#
 # imports:
 import logging
 from datetime import datetime, timedelta
@@ -34,40 +38,45 @@ logging.getLogger().addHandler(console)
 #
 logging.info(datetime.now())
 logging.info("Starting AlphaVantage data script")
-logging.info("Load imports")
 # variables
 logging.info("Set variables")
 RSI_PERIOD = 14 # no. of days to calculate RSI
 RSI_INT = 'daily' # interval to calculate RSI
 # RSI values
-RSIVLOW = 15
+RSIVLOW = 20
 RSILOW = 45
 RSIHIGH = 65
-RSIVHIGH = 85
+RSIVHIGH = 80
 # RSI Suggestions
 BUY = "BUY"
 SELL = "SELL"
 HOLD = "-"
 #
-WAITAPI = 1
-WAITERR = 1
-
+WAITAPI = 3
+WAITERR = 12
+#
+keys = "scripts/AlphaVantage/keys/keys.txt" # list of alpha vantage keys
+#
 tickerlist = "tickerfile_TRADELIST.txt"
 #tickerlist = "tickerfile_TEST.txt"
-tickerlist = "tickerfile_TEST_USA.txt"
+#tickerlist = "tickerfile_TEST_USA.txt"
+#
 tickerlist = "tickers/AV/{}".format(tickerlist)
 logging.info(tickerlist)
 with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
 
 def GetAPIkey(): # get a new API key each time the script runs
-    logging.info("Get API Key")
-    keys = "scripts/AlphaVantage/keys/keys.txt"
-    lines = open(keys).read().splitlines()
-    global APIkey
-    APIkey = random.choice(lines)
-    #logging.info("Got API key, {key}, now waiting to continue...".format(key = APIkey))
-    time.sleep(WAITAPI)
+    try:
+        #logging.info("Get API Key")
+        lines = open(keys).read().splitlines()
+        global APIkey
+        APIkey = random.choice(lines)
+        #logging.info("Got API key, {key}, now waiting to continue...".format(key = APIkey))
+        time.sleep(WAITAPI)
+    except:
+        logging.exception("Error getting API key")
+        #time.sleep(WAITERR)
 
 df2 = pd.DataFrame(columns=[])  # create empty dataframe
 logging.info(datetime.now())
@@ -158,13 +167,15 @@ logging.info("PRINT df2")
 logging.info(df2)
 
 logging.info("Write 'df2' to csv")
-CSV_FILE = datetime.now().strftime('scripts/AlphaVantage/output/TEST_AVData_%Y%m%d.csv')
+CSV_FILE = datetime.now().strftime('scripts/AlphaVantage/output/AVData_%Y%m%d.csv')
 df2.to_csv(CSV_FILE,index=False)
 
 #df2 = df2.read_csv(CSV_FILE)
 
 logging.info(datetime.now())
 
-#https://www.alphavantage.co/query?function=TimeSeries&symbol=AAPL&apikey=T36W24357QF5Z698
-#https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=T36W24357QF5Z698
+#https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=T36W24357QF5Z698
+#https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=LON:BP.L&apikey=T36W24357QF5Z698
+#https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=AAPL&interval=5min&apikey=T36W24357QF5Z698
+#https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=LON:BP.L&apikey=T36W24357QF5Z698
 #https://www.alphavantage.co/query?function=RSI&symbol=AAPL&interval=daily&time_period=14&series_type=CLOSE&apikey=T36W24357QF5Z698
