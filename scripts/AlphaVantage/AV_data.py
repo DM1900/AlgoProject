@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.9
 # DerekM - 2021
 # The data is gathered from Alpha Vantage which has a delay of 1 day on all stock data.
 # Please factor that into any tradng decisions (this is based on Daily RSI so it's not such a big issue here)
@@ -40,6 +40,10 @@ logging.info(datetime.now())
 logging.info("Starting AlphaVantage data script")
 # variables
 logging.info("Set variables")
+#
+START = datetime.now()
+logging.info(START)
+#
 RSI_PERIOD = 14 # no. of days to calculate RSI
 RSI_INT = 'daily' # interval to calculate RSI
 # RSI values
@@ -52,8 +56,8 @@ BUY = "BUY"
 SELL = "SELL"
 HOLD = "-"
 #
-WAITAPI = 3
-WAITERR = 12
+WAITAPI = 4
+WAITERR = 8
 #
 keys = "scripts/AlphaVantage/keys/keys.txt" # list of alpha vantage keys
 #
@@ -156,24 +160,29 @@ def get_data(ticker):
     except: # catch all exceptions in the same way
         logging.exception("Main Error catch")
         logging.info("{} - Error found, {}, attempting to continue...".format(ticker, "Main Error catch"))
+try:
+    logging.info("get_data has been set, running it now...")
+    for ticker in tickers:
+        get_data(ticker)
 
-logging.info("get_data has been set, running it now...")
-for ticker in tickers:
-    get_data(ticker)
+    #df2 = df2.sort_values(by=['Ticker'])
+    df2 = df2.sort_values(by=['Suggestion','RSI'], ascending=False)
+    logging.info("PRINT df2")
+    logging.info(df2)
 
-#df2 = df2.sort_values(by=['Ticker'])
-df2 = df2.sort_values(by=['Suggestion','RSI'], ascending=False)
-logging.info("PRINT df2")
-logging.info(df2)
-
-logging.info("Write 'df2' to csv")
-CSV_FILE = datetime.now().strftime('scripts/AlphaVantage/output/AVData_%Y%m%d.csv')
-df2.to_csv(CSV_FILE,index=False)
+    logging.info("Write 'df2' to csv")
+    CSV_FILE = datetime.now().strftime('scripts/AlphaVantage/output/AVData_%Y%m%d.csv')
+    df2.to_csv(CSV_FILE,index=False)
+except: # catch all exceptions in the same way
+    logging.exception("Error running get_data loop")
+    #logging.info("Error")
 
 #df2 = df2.read_csv(CSV_FILE)
-
-logging.info(datetime.now())
-
+FINISH = datetime.now()
+logging.info(FINISH)
+TIMETAKEN = FINISH - START
+logging.info("Time taken to run the script: {}".format(TIMETAKEN))
+logging.info("End")
 #https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=T36W24357QF5Z698
 #https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=LON:BP.L&apikey=T36W24357QF5Z698
 #https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=AAPL&interval=5min&apikey=T36W24357QF5Z698
