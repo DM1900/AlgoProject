@@ -47,10 +47,10 @@ logging.info(START)
 RSI_PERIOD = 14 # no. of days to calculate RSI
 RSI_INT = 'daily' # interval to calculate RSI
 # RSI values
-RSIVLOW = 20
+RSIVLOW = 15
 RSILOW = 45
 RSIHIGH = 65
-RSIVHIGH = 80
+RSIVHIGH = 85
 # RSI Suggestions
 BUY = "BUY"
 SELL = "SELL"
@@ -129,7 +129,7 @@ def get_data(ticker):
                 TEMPdf = TEMPdf.append(dataRSI)
                 RS = TEMPdf.last('1D')
                 RS = RS.iat[0,0]
-                RSR = round(RS,1)
+                RSR = round(RS,2)
                 df['RSI'] = RSR
                 # suggest buy/sell based on RSI & price action
                 if  RS > RSIVHIGH: 
@@ -183,8 +183,10 @@ logging.info(FINISH)
 TIMETAKEN = FINISH - START
 logging.info("Time taken to run the script: {}".format(TIMETAKEN))
 logging.info("End")
-#https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=T36W24357QF5Z698
+
 #https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=LON:BP.L&apikey=T36W24357QF5Z698
 #https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=AAPL&interval=5min&apikey=T36W24357QF5Z698
 #https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=LON:BP.L&apikey=T36W24357QF5Z698
 #https://www.alphavantage.co/query?function=RSI&symbol=AAPL&interval=daily&time_period=14&series_type=CLOSE&apikey=T36W24357QF5Z698
+#https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=IBM&apikey=demo
+#https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=T36W24357QF5Z698
