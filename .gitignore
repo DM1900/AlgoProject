@@ -5,3 +5,4 @@ testing/PythonApp/
 output/TEMP-file.txt
 scripts/AlphaVantage/keys.txt
 scripts/AlphaVantage/keys/
+scripts/AlphaVantage/data/

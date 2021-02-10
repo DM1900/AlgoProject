@@ -11,10 +11,7 @@ import random
 RSI_PERIOD = 14 # no. of days to calculate RSI
 RSI_INT = 'daily' # interval to calculate RSI
 
-global df
-
-ticker = ['BP']
-ticker = ['AAPL']
+tickers = ['AML.LON','AAPL']
 
 def GetAPIkey(): # get a new API key each time the script runs
     keys = "scripts/AlphaVantage/keys/keys.txt"
@@ -32,7 +29,7 @@ def get_data(ticker):
     df = pd.DataFrame(data)
     df.append(data)
     ti = TechIndicators(key=APIkey, output_format='pandas')
-    dataRSI = ti.get_rsi(symbol=ticker,interval=RSI_INT, time_period=RSI_PERIOD)
+    dataRSI = ti.get_rsi(symbol=ticker,interval=RSI_INT,time_period=RSI_PERIOD)
     dataRSI = dataRSI[0]
     TEMPdf = TEMPdf.append(dataRSI)    
     RS = TEMPdf.last('1D')
@@ -42,4 +39,5 @@ def get_data(ticker):
     df = df.transpose()
     print(df)
 
-get_data(ticker)
+for ticker in tickers:
+    get_data(ticker)

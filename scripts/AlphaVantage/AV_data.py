@@ -38,6 +38,7 @@ logging.getLogger().addHandler(console)
 #
 logging.info(datetime.now())
 logging.info("Starting AlphaVantage data script")
+
 # variables
 logging.info("Set variables")
 #
@@ -47,21 +48,24 @@ logging.info(START)
 RSI_PERIOD = 14 # no. of days to calculate RSI
 RSI_INT = 'daily' # interval to calculate RSI
 # RSI values
-RSIVLOW = 15
+RSIVLOW = 20
 RSILOW = 45
 RSIHIGH = 65
-RSIVHIGH = 85
+RSIVHIGH = 80
+logging.info("RSI settings: Period: {} days, Low: {}, High {}".format(RSI_PERIOD,RSILOW,RSIHIGH))
 # RSI Suggestions
 BUY = "BUY"
+BUYRSI = "BUY (RSI very low)"
 SELL = "SELL"
+SELLRSI = "SELL (RSI very high)"
 HOLD = "-"
 #
-WAITAPI = 4
+WAITAPI = 3
 WAITERR = 8
 #
 keys = "scripts/AlphaVantage/keys/keys.txt" # list of alpha vantage keys
 #
-tickerlist = "tickerfile_TRADELIST.txt"
+tickerlist = "tickerfile_TRADELIST.txt" # this is the mian one with all tickers
 #tickerlist = "tickerfile_TEST.txt"
 #tickerlist = "tickerfile_TEST_USA.txt"
 #
@@ -133,9 +137,9 @@ def get_data(ticker):
                 df['RSI'] = RSR
                 # suggest buy/sell based on RSI & price action
                 if  RS > RSIVHIGH: 
-                    SUGGESTION = SELL
+                    SUGGESTION = SELLRSI
                 elif RS < RSIVLOW:
-                    SUGGESTION = BUY
+                    SUGGESTION = BUYRSI
                 elif  RS > RSIHIGH: 
                     if DCLOSE > DPRICE:
                         SUGGESTION = SELL
