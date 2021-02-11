@@ -7,4 +7,4 @@ mv logs/*.log logs/2021/
 # move csv files
 mv scripts/AlphaVantage/output/*.csv scripts/AlphaVantage/output/2021/
 
-# end
+# end 
