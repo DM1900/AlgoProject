@@ -12,6 +12,7 @@ RSI_PERIOD = 14 # no. of days to calculate RSI
 RSI_INT = 'daily' # interval to calculate RSI
 
 tickers = ['AML.LON','AAPL']
+tickers = ['DIS']
 
 def GetAPIkey(): # get a new API key each time the script runs
     keys = "scripts/AlphaVantage/keys/keys.txt"

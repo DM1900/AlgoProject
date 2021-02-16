@@ -1,43 +1,20 @@
-import csv
-from datetime import datetime, timedelta
+import sqlite3
+from sqlite3.dbapi2 import Cursor
 
-# Python program showing  
-# a use of input() 
+# define connection & cursor
+DB_FOLDER = '/home/admin/AlgoProject/scripts/AlphaVantage/db/' 
+DB_NAME = 'pnl.db'
+DB_NAME = 'StockData.db'
+DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
+connection = sqlite3.connect(DB_NAME)
 
-Date = datetime.now().strftime("%d/%m/%Y") # "%Y%m%d-%H%M") # input("Enter the date (dd/mm/yyyy): ") 
-print("Enter data for {}".format(Date))
+cursor = connection.cursor()
+# delete a table
+NUM = 2020
+TABLE_NAME = "StockData_20210215_{}".format(NUM)
+#TABLE_NAME = "pldataTEST"
+#TABLE_NAME = "StockData_20210215_test4"
 
-TotalValue = input("Enter total account value: ") 
-PieValue = input("Enter Pie value: ") 
-Investment = input("Enter invested amount: ") 
-PieInvestment = input("Enter Pie invested amount: ") 
-Realised = input("Enter Realised value: ") 
-Dividend = input("Enter Dividend value received: ") 
-
-CSVFILE =  'scripts/AlphaVantage/data/stock_2021.csv'
-
-# https://realpython.com/python-csv/
-print(Date,TotalValue,PieValue,Investment,PieInvestment,Realised,Dividend)
-
- 
-
-with open(CSVFILE, mode='a') as file:
-    writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    #employee_writer.writerow(['John Smith', 'Accounting', 'November'])
-    writer.writerow([Date,TotalValue,PieValue,Investment,PieInvestment,Realised,Dividend])
-
-"""
-"""
-
-TOTAL = 1899.42
-PIE = 444.85
-
-ACTIVE = round(TOTAL-PIE,2)
-
-print(ACTIVE)
-
-RISK = 0.5
-TORISK = round(ACTIVE*(RISK/100),2)
-
-print(TORISK)
-"""
+cmd = "DROP TABLE IF EXISTS {}".format(TABLE_NAME)
+cursor.execute(cmd)
+connection.commit()

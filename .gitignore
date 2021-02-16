@@ -1,8 +1,8 @@
+django/
 old/
 output/
 logs/
-testing/PythonApp/
-output/TEMP-file.txt
-scripts/AlphaVantage/keys.txt
-scripts/AlphaVantage/keys/
-scripts/AlphaVantage/data/
+testing/
+scripts/AlphaVantage/keys/keys.txt
+scripts/AlphaVantage/db/pnl.db
+scripts/AlphaVantage/output/

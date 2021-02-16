@@ -60,8 +60,8 @@ SELL = "SELL"
 SELLRSI = "SELL (RSI very high)"
 HOLD = "-"
 #
-WAITAPI = 3
-WAITERR = 8
+WAITAPI = 5
+WAITERR = 5
 #
 keys = "scripts/AlphaVantage/keys/keys.txt" # list of alpha vantage keys
 #
@@ -137,9 +137,9 @@ def get_data(ticker):
                 df['RSI'] = RSR
                 # suggest buy/sell based on RSI & price action
                 if  RS > RSIVHIGH: 
-                    SUGGESTION = SELLRSI
+                    SUGGESTION = SELL
                 elif RS < RSIVLOW:
-                    SUGGESTION = BUYRSI
+                    SUGGESTION = BUY
                 elif  RS > RSIHIGH: 
                     if DCLOSE > DPRICE:
                         SUGGESTION = SELL
