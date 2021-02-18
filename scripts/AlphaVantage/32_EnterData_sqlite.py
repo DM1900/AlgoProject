@@ -1,5 +1,9 @@
 #!/usr/bin/python3.9
 # DerekM - 2021
+#
+# Enter data to the DB
+# this is data about account portfolio (Stock value, Pie Value, etc)
+#
 
 import sqlite3
 from sqlite3.dbapi2 import Cursor

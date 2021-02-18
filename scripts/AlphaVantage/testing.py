@@ -10,7 +10,7 @@ connection = sqlite3.connect(DB_NAME)
 
 cursor = connection.cursor()
 # delete a table
-NUM = 2020
+NUM = 2021
 TABLE_NAME = "StockData_20210215_{}".format(NUM)
 #TABLE_NAME = "pldataTEST"
 #TABLE_NAME = "StockData_20210215_test4"

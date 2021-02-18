@@ -58,7 +58,7 @@ DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value da
 connection = sqlite3.connect(DB_NAME)
 cursor = connection.cursor()
 # create table:
-TABLE_DATE = datetime.now().strftime("%Y%m%d_%H%M")
+TABLE_DATE = datetime.now().strftime("%Y%m%d_%H")
 TABLE_NAME = "StockData_{}".format(TABLE_DATE)
 #TABLE_NAME = "StockData_20210215_test4"
 
@@ -111,9 +111,9 @@ BUY = "BUY"
 BUYRSI = "BUY (RSI very low)"
 SELL = "SELL"
 SELLRSI = "SELL (RSI very high)"
-HOLD = "NULL"
+HOLD = "HOLD"
 # how long to wait between API calls (kind of irrelevant due to the way Alpha Vantage limits calls, but anyway...)
-WAITAPI = 1
+WAITAPI = 5
 WAITERR = 5
 #
 # list of alpha vantage keys
@@ -123,6 +123,7 @@ keys = "scripts/AlphaVantage/keys/keys.txt"
 tickerlist = "tickerfile_TRADELIST.txt" # main list of all selected tickers
 #tickerlist = "tickerfile_TEST.txt"
 #tickerlist = "tickerfile_TEST_USA.txt"
+#
 tickerlist = "tickers/AV/{}".format(tickerlist)
 #
 logging.info(tickerlist)
@@ -156,6 +157,7 @@ def get_data(ticker):
         # Price data
         logging.info("Get price data")
         SUCCESS = 0
+        DCHANGE = 0
         while SUCCESS < 10:
             try:
                 GetAPIkey() # get a new API key each time the script runs
@@ -165,21 +167,21 @@ def get_data(ticker):
                 DTICKER = TEMPdf.iat[0,0]
                 DTICKER = '"{}"'.format(DTICKER)
                 print("Getting data for {}".format(DTICKER))
-                #df = df.append({'Ticker':DTICKER}, ignore_index=True) # add to df
+                print(DTICKER)
                 DPRICE = TEMPdf.iat[0,4]
-                #df['Price'] = DPRICE # add to df
+                print(DPRICE)
                 DCLOSE = TEMPdf.iat[0,7]
-                #df['PreviousClose'] = DCLOSE # add to df
+                print(DCLOSE)
                 DCHANGE = TEMPdf.iat[0,9]
                 DCHANGE = '"{}"'.format(DCHANGE)
-                #df['Change(%)'] = DCHANGE # add to df
+                print(DCHANGE)
                 TEMPdf = pd.DataFrame() # create empty dataframe
                 SUCCESS=True
                 break
             except:
                 logging.exception("{} - Price exception".format(ticker))
                 SUCCESS=SUCCESS + 1
-                logging.debug("{} - Error found, {}, attempt no. {}. ({})".format(ticker, "Price", SUCCESS, APIkey))
+                logging.debug("{} - Error found, {}, attempt no. {}. ({})".format(DCHANGE, DCHANGE, SUCCESS, APIkey))
                 time.sleep(WAITERR)
         # RSI data
         logging.info("Get RSI data")
@@ -193,7 +195,9 @@ def get_data(ticker):
                 TEMPdf = TEMPdf.append(dataRSI)
                 RS = TEMPdf.last('1D')
                 RS = RS.iat[0,0]
+                print(RS)
                 RSR = round(RS,2)
+                print(RSR)
                 #df['RSI'] = RSR
                 # suggest buy/sell based on RSI & price action
                 if  RS > RSIVHIGH: 
@@ -212,7 +216,8 @@ def get_data(ticker):
                         SUGGESTION = HOLD
                 else:
                     SUGGESTION = HOLD
-                #df['Suggestion'] = SUGGESTION
+                SUGGESTION = '"{}"'.format(SUGGESTION)
+                print(SUGGESTION)
                 #df2 = df2.append(df)
                 break
                 #logging.info(df2)
@@ -222,6 +227,7 @@ def get_data(ticker):
                 logging.debug("{} - Error found, {}, attempt no. {}. ({})".format(ticker, "RSI", SUCCESS, APIkey))
                 time.sleep(WAITERR)
         INSERT_CMD = "INSERT INTO {} VALUES (NULL,{},{},{},{},{},{},{},NULL)".format(TABLE_NAME,DDATE,DTICKER,DPRICE,DCLOSE,DCHANGE,RSR,SUGGESTION)
+        print("Print INSERT_CMD")
         print(INSERT_CMD)
         cursor.execute(INSERT_CMD)
         connection.commit()
@@ -233,19 +239,10 @@ try:
     logging.info("get_data has been set, running it now...")
     for ticker in tickers:
         get_data(ticker)
-
-    #df2 = df2.sort_values(by=['Ticker'])
-    #df2 = df2.sort_values(by=['Suggestion','RSI'], ascending=False)
-    #logging.info("PRINT df2")
-    #logging.info(df2)
-
-    #logging.info("Write 'df2' to csv")
-    #CSV_FILE = datetime.now().strftime('scripts/AlphaVantage/output/AVData_%Y%m%d.csv')
-    #df2.to_csv(CSV_FILE,index=False)
 except: # catch all exceptions in the same way
     logging.exception("Error running get_data loop")
     #logging.info("Error")
-exit()
+
 
 # read the newly created table
 def read_table(cmd):
@@ -254,7 +251,7 @@ def read_table(cmd):
     print(results)
 # gather all data
 cmd = "SELECT * FROM {}".format(TABLE_NAME)
-read_table(cmd)
+#read_table(cmd)
 
 # finish up
 # #df2 = df2.read_csv(CSV_FILE)

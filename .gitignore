@@ -4,5 +4,5 @@ output/
 logs/
 testing/
 scripts/AlphaVantage/keys/keys.txt
-scripts/AlphaVantage/db/pnl.db
+scripts/AlphaVantage/db/
 scripts/AlphaVantage/output/
