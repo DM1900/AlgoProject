@@ -3,8 +3,15 @@ import sqlite3
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 #plt.close("all")
-plt.style.use('fivethirtyeight')
+# plot style
 
+style = 'fivethirtyeight'
+style = 'ggplot'
+style = 'fast'
+style = 'seaborn'
+style = 'seaborn-whitegrid'
+
+plt.style.use(style)
 
 # Create your connection.
 DB_FOLDER = '/home/admin/AlgoProject/scripts/AlphaVantage/db/' 

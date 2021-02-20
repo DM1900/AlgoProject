@@ -195,9 +195,9 @@ def get_data(ticker):
                 TEMPdf = TEMPdf.append(dataRSI)
                 RS = TEMPdf.last('1D')
                 RS = RS.iat[0,0]
-                print(RS)
+                #print(RS)
                 RSR = round(RS,2)
-                print(RSR)
+                #print(RSR)
                 #df['RSI'] = RSR
                 # suggest buy/sell based on RSI & price action
                 if  RS > RSIVHIGH: 
@@ -217,7 +217,7 @@ def get_data(ticker):
                 else:
                     SUGGESTION = HOLD
                 SUGGESTION = '"{}"'.format(SUGGESTION)
-                print(SUGGESTION)
+                #print(SUGGESTION)
                 #df2 = df2.append(df)
                 break
                 #logging.info(df2)

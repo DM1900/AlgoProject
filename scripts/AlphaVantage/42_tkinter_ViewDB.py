@@ -6,7 +6,8 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from ttkthemes import ThemedStyle 
 from ttkthemes import ThemedTk
-
+import sys
+import os
 import sqlite3
 from sqlite3.dbapi2 import Cursor
 from typing import Text
@@ -122,9 +123,6 @@ else:#  YEAR == "2021":
     DPER = round((((DVAL / DINV)-1)*100) ,1)
     DPIV = round((((DPIE / DPIEINV)-1)*100) ,1)
 
-
-
-
 ###
 print("Try to create tkinter window")
 
@@ -133,10 +131,19 @@ print("Try to create tkinter window")
 #window.mainloop()
 
 #window = tk.Tk()
+style = "clam"
+style = "black"
+style = "alt"
+style = "breeze"
+#style = "blue"
+#style = "equilux"
+style = "default"
+#style = "aqua"
 
-window = ThemedTk(theme="default")
+window = ThemedTk(theme=style)
 info = "Account Data {}".format(DDATE)
 window.title(info)
+window.geometry('300x300')
 
 frame_a = ttk.Frame()
 frame_b = ttk.Frame()
@@ -145,7 +152,7 @@ frame_c = ttk.Frame()
 TEXT = """Total value of account is €{}
 Realised value is €{}
 Diviend recieved is €{}""".format(DTOTAL,DREAL,DDIV)
-ttk.Label(master=frame_a, text=TEXT).pack()
+ttk.Label(master=frame_a, text=TEXT).grid(column=0,row=0)
 
 TEXT = """Stock value is €{}
 Stock investment is €{}
@@ -161,6 +168,16 @@ ttk.Label(master=frame_c, text=TEXT).pack()
 frame_a.pack()
 frame_b.pack()
 frame_c.pack()
+
+
+def call_script():
+    print("Create chart")
+    pycmd = 'python scripts/AlphaVantage/41_VisualiseData.py'
+    os.system(pycmd)
+
+
+#script = "python scripts/AlphaVantage/41_VisualiseData.py"
+ttk.Button(window, text="Create Chart", command=call_script).pack()
 
 ttk.Button(window, text="Quit", command=window.destroy).pack()
 
