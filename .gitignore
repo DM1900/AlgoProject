@@ -1,8 +1,14 @@
+# exclude django:
 django/
+# exclude old and logs:
 old/
 output/
 logs/
 testing/
 scripts/AlphaVantage/keys/keys.txt
+# exclude databases:
 scripts/AlphaVantage/db/
+scripts/AlphaVantage/db/pnl.db
+scripts/AlphaVantage/db/StockData.db
+# exclude output data:
 scripts/AlphaVantage/output/

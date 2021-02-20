@@ -11,8 +11,5 @@ Algorithm Project
 ## Presentation
 ##### Requirements for presenting the data on a web page
 * Linux machine
-* Django installed and configured
-* html/css page set up
-* Python integration
-* either on demand or cron job,to run the script  
+* Python 
 
