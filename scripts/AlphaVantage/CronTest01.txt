@@ -1,1 +1,6 @@
-Start 2021-02-12 11:05:01.977488, Finish 2021-02-12 11:05:03.979659, Total 0:00:02.002171
+21/02/2021 14:12:17
+attempting to run getdata script from Cron
+/usr/bin/python /home/admin/AlgoProject/scripts/AlphaVantage/02_get_data_sqlite.py
+21/02/2021 14:12:32
+attempting to run getdata script from Cron
+/usr/bin/python /home/admin/AlgoProject/scripts/AlphaVantage/02_get_data_sqlite.py

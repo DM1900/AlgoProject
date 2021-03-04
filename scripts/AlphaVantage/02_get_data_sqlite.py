@@ -4,6 +4,7 @@
 # Please factor that into any tradng decisions (this is based on Daily RSI so it's not such a big issue here)
 #
 # imports:
+
 import logging
 from datetime import datetime, timedelta
 import pandas as pd
@@ -117,7 +118,7 @@ WAITAPI = 5
 WAITERR = 5
 #
 # list of alpha vantage keys
-keys = "scripts/AlphaVantage/keys/keys.txt" 
+keys = "/home/admin/AlgoProject/scripts/AlphaVantage/keys/keys.txt" 
 #
 # this is the mian one with all tickers
 tickerlist = "tickerfile_TRADELIST.txt" # main list of all selected tickers
@@ -131,6 +132,7 @@ with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
 
 #tickers = ['AAPL']
+
 
 def GetAPIkey(): # get a new API key each time the script runs
     try:
