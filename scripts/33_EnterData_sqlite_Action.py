@@ -9,17 +9,17 @@ from sqlite3.dbapi2 import Cursor
 from datetime import datetime, timedelta
 
 # define connection & cursor
-DB_FOLDER = '/home/admin/AlgoProject/scripts/AlphaVantage/db/' 
-DB_NAME = 'pnl.db'
-#DB_NAME = 'StockData.db'
+DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
+#DB_NAME = 'pnl.db'
+DB_NAME = 'StockData.db'
 DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
 connection = sqlite3.connect(DB_NAME)
 cursor = connection.cursor()
 print("DB name: {}".format(DB_NAME))
 # create table:
-TABLE_DATE = "20210217_01"
+TABLE_DATE = "20210304_22"
 TABLE_NAME = "StockData_{}".format(TABLE_DATE)
-TABLE_NAME = "pldata"
+#TABLE_NAME = "pldata"
 print("Table name: {}".format(TABLE_NAME))
 # entry_id,Date,TotalValue,PieValue,Investment,PieInvestment,Realised,Dividend
 input("If DB & Table are correct press enter to continue...")
@@ -32,7 +32,6 @@ def read_table(TABLE_NAME):
     print(results)
 
 #read_table(TABLE_NAME)
-
 
 #def enter_data():
 #    INSERT_CMD = "UPDATE StockData_20210217_01 SET Action = 'test' WHERE Ticker = 'NKE'"
@@ -78,10 +77,10 @@ def enter_data(TABLE_NAME,COLACT,VALUE,COLSRCH,TERM):
     cursor.execute(INSERT_CMD)
     connection.commit()
 
-COLACT = "Investment" # this is the column to change
-VALUE = "1200" # this the value to set 'COLACT to
-COLSRCH = "entry_id" # this is the search column
-TERM = "49" # this is term to search in COLSRCH
+COLACT = "Action" # this is the column to change
+VALUE = "Ignore" # this the value to set 'COLACT to
+COLSRCH = "Ticker" # this is the search column
+TERM = "RTN.LON" # this is term to search in COLSRCH
 enter_data(TABLE_NAME,COLACT,VALUE,COLSRCH,TERM)
 
 

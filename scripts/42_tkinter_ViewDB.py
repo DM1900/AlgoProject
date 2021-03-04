@@ -34,7 +34,7 @@ greeting.mainloop()
 #print(themes)
 
 # define connection & cursor
-DB_FOLDER = '/home/admin/AlgoProject/scripts/AlphaVantage/db/' 
+DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
 DB_NAME = 'pnl.db'
 DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
 connection = sqlite3.connect(DB_NAME)
@@ -71,7 +71,7 @@ def get_data(DATA):
     DDIV = DATA[7]
     DVAL = DATA[8]
     DPER = round((((DVAL / DINV)-1)*100) ,1)
-    DPIV = round((((DPIE / DPIEINV)-1)*100) ,1)
+    #DPIV = round((((DPIE / DPIEINV)-1)*100) ,1)
 
 # gather data for specific year
 YEAR = input("Choose year to gather data for (leave blank to gather all data): ") or "0" # ask user to enter year
@@ -110,18 +110,31 @@ else:#  YEAR == "2021":
     cmd = "SELECT * FROM {} WHERE {} LIKE '%{}%' ORDER BY entry_id DESC LIMIT 1".format(TABLE_NAME,col,var) # get data from 1 year
     print(cmd)
     read_table_year(cmd,var)
+    LYPROF = (DTOTAL - DPIE) - DINV
     DATA = results[0]
     DENTRYID = DATA[0]
     DDATE = DATA[1]
-    DTOTAL = DATA[2] - DTOTAL
-    DPIE = DATA[3] - DPIE
-    DINV = DATA[4] - DINV
-    DPIEINV = DATA[5] - DPIEINV
-    DREAL = DATA[6] - DREAL
-    DDIV = DATA[7] - DDIV
-    DVAL = DATA[8] - DVAL
+    DTOTAL = DATA[2] # Total account value
+    #DPIE = DATA[3] - DPIE
+    DINVO = DINV # This is the total amount actually lodged to the account
+    DINV = DATA[4] + LYPROF # Total amount invested plus profit from last year
+    #DPIEINV = DATA[5] - DPIEINV
+    DREAL = DATA[6] - DREAL # amount realised this calendar year
+    DDIV = DATA[7] - DDIV # dividend received this calendar year
+    DVAL = DATA[8] 
     DPER = round((((DVAL / DINV)-1)*100) ,1)
-    DPIV = round((((DPIE / DPIEINV)-1)*100) ,1)
+    #DPIV = round((((DPIE / DPIEINV)-1)*100) ,1)
+
+TEXT = """Total value of account is €{}
+{} stats:
+Realised value is €{}
+Diviend recieved is €{}
+Stock value is €{}
+Investment value is €{}
+Stock value increase is {}%""".format(DTOTAL,YEAR,DREAL,DDIV,DVAL,DINV,DPER)
+print(TEXT)
+
+exit()
 
 ###
 print("Try to create tkinter window")
@@ -172,11 +185,11 @@ frame_c.pack()
 
 def call_script():
     print("Create chart")
-    pycmd = 'python scripts/AlphaVantage/41_VisualiseData.py'
+    pycmd = 'python scripts/41_VisualiseData.py'
     os.system(pycmd)
 
 
-#script = "python scripts/AlphaVantage/41_VisualiseData.py"
+#script = "python scripts/41_VisualiseData.py"
 ttk.Button(window, text="Create Chart", command=call_script).pack()
 
 ttk.Button(window, text="Quit", command=window.destroy).pack()
@@ -196,7 +209,7 @@ exit()
 
 
 # define connection & cursor
-DB_FOLDER = '/home/admin/AlgoProject/scripts/AlphaVantage/db/' 
+DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
 DB_NAME = 'pnl.db'
 DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
 connection = sqlite3.connect(DB_NAME)

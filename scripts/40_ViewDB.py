@@ -5,7 +5,7 @@ import sqlite3
 from sqlite3.dbapi2 import Cursor
 
 # define connection & cursor
-DB_FOLDER = '/home/admin/AlgoProject/scripts/AlphaVantage/db/' 
+DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
 DB_NAME = 'pnl.db'
 DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
 connection = sqlite3.connect(DB_NAME)
@@ -27,7 +27,7 @@ cmd = "SELECT * FROM {}".format(TABLE_NAME)
 
 # gather data from specific dates
 col = "Date"
-var = "2021"
+var = "2020"
 cmd = "SELECT * FROM {} WHERE {} LIKE '%{}%'".format(TABLE_NAME,col,var)
 read_table(cmd)
 

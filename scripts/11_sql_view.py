@@ -1,7 +1,5 @@
 #!/usr/bin/python3.9
 # DerekM - 2021
-# The data is gathered from Alpha Vantage which has a delay of 1 day on all stock data.
-# Please factor that into any tradng decisions (this is based on Daily RSI so it's not such a big issue here)
 #
 # imports:
 from datetime import datetime, timedelta
@@ -20,7 +18,7 @@ from sqlite3.dbapi2 import Cursor
 #
 # create sql table
 # define connection & cursor
-DB_FOLDER = '/home/admin/AlgoProject/scripts/AlphaVantage/db/' 
+DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
 #DB_NAME = 'pnl.db'
 DB_NAME = 'StockData.db'
 DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
@@ -46,7 +44,6 @@ TABLE_NAME = "StockData_20210217_01"
 #connection.commit()
 #exit()
 #
-
 
 # read the newly created table
 def read_table(cmd):

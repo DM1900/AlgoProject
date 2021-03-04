@@ -27,15 +27,15 @@ logging.getLogger().addHandler(console)
 logging.info(datetime.now())
 
 try:
-    CSV_FILE = 'scripts/AlphaVantage/output/AVData_20210108.csv'
-    CSV_FILE = datetime.now().strftime('scripts/AlphaVantage/output/AVData_%Y%m%d.csv')
+    CSV_FILE = 'scripts/output/AVData_20210108.csv'
+    CSV_FILE = datetime.now().strftime('scripts/output/AVData_%Y%m%d.csv')
     logging.info("Opening CSV file: {}".format(CSV_FILE))
 
     df2 = pd.read_csv(CSV_FILE)
     df2 = df2[df2.Suggestion != "-"]
     logging.info(df2)
     logging.info("Output 'df2' to CSV file")
-    CSV_FILE = datetime.now().strftime('scripts/AlphaVantage/output/SuggestionDataOnly_%Y%m%d.csv')
+    CSV_FILE = datetime.now().strftime('scripts/output/SuggestionDataOnly_%Y%m%d.csv')
     df2.to_csv(CSV_FILE,index=False)
 except:
     logging.exception("CSV error")

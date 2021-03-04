@@ -89,7 +89,7 @@ def dictToCSS(dictionnary):
  
 def create_chart():
     print("Generating chart")
-    pycmd = 'python /home/admin/AlgoProject/scripts/AlphaVantage/41_VisualiseData.py'
+    pycmd = 'python /home/admin/AlgoProject/scripts/41_VisualiseData.py'
     os.system(pycmd)
 
 def show_portfolio():
@@ -101,17 +101,17 @@ def get_stock_data():
     check = input("Are you sure? could take 25 minutes! (y or n) ") or "n"
     if check == "y":
         print("Generating stock suggestion data")
-        pycmd = 'python /home/admin/AlgoProject/scripts/AlphaVantage/02_get_data_sqlite.py'
+        pycmd = 'python /home/admin/AlgoProject/scripts/02_get_data_sqlite.py'
         os.system(pycmd)
     else:
         print("No action taken")
 
 def enter_data():
     print("Enter data...")
-    pycmd = 'python /home/admin/AlgoProject/scripts/AlphaVantage/32_EnterData_sqlite.py'
+    pycmd = 'python /home/admin/AlgoProject/scripts/32_EnterData_sqlite.py'
     os.system(pycmd)
 
-DB_FOLDER = '/home/admin/AlgoProject/scripts/AlphaVantage/db/' 
+DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
 DB_NAME = 'pnl.db'
 DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
 connection = sqlite3.connect(DB_NAME)
@@ -145,7 +145,7 @@ def get_data(DATA):
     DDIV = DATA[7]
     DVAL = DATA[8]
     DPER = round((((DVAL / DINV)-1)*100) ,1)
-    DPIV = round((((DPIE / DPIEINV)-1)*100) ,1)
+    DPIV = 0 # round((((DPIE / DPIEINV)-1)*100) ,1)
 
 # gather data for specific year
 YEAR = 0 # input("Choose year to gather data for (leave blank to gather all data): ") or "0" # ask user to enter year

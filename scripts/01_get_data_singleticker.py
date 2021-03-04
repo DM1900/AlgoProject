@@ -7,23 +7,20 @@ from alpha_vantage.timeseries import TimeSeries
 from alpha_vantage.techindicators import TechIndicators 
 import sys
 import random
+from py_util import AV_func
 
+KEYS = "/home/admin/AlgoProject/scripts/keys/keys.txt" 
 RSI_PERIOD = 14 # no. of days to calculate RSI
 RSI_INT = 'daily' # interval to calculate RSI
 
 tickers = ['AML.LON','AAPL']
 tickers = ['DIS']
 
-def GetAPIkey(): # get a new API key each time the script runs
-    keys = "scripts/AlphaVantage/keys/keys.txt"
-    lines = open(keys).read().splitlines()
-    global APIkey
-    APIkey = random.choice(lines)
 
 def get_data(ticker):
+    APIkey = AV_func.GetAPIkey(KEYS) # get a new API key each time the script runs
     TEMPdf = pd.DataFrame()   # create empty dataframe
     print("Gather data for {}".format(ticker))
-    GetAPIkey() # get a new API key each time the script runs
     ts = TimeSeries(key=APIkey, output_format='pandas')
     data = ts.get_quote_endpoint(symbol=ticker)
     data = data[0]
