@@ -14,7 +14,7 @@ style = 'seaborn-whitegrid'
 plt.style.use(style)
 
 # Create your connection.
-DB_FOLDER = '/home/admin/AlgoProject/scripts/AlphaVantage/db/' 
+DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
 DB_NAME = 'pnl.db'
 DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
 print(DB_NAME)

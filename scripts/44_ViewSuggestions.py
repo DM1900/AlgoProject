@@ -24,7 +24,6 @@ cursor = connection.cursor()
 TABLE_DATE = "20210304_22"
 TABLE_NAME = "StockData_{}".format(TABLE_DATE)
 
-
 def read_table(cmd):
     global results
     cursor.execute(cmd)
@@ -34,12 +33,16 @@ def read_table(cmd):
 cmd = "SELECT * FROM {}".format(TABLE_NAME)
 #read_table(cmd)
 
-var = input("Choose to view BUY or SELL: ") or "BUY"# ask user to enter year
+var = input("Choose to view BUY or SELL (Leave blank for both): ") or "Both"# ask user to enter year
 
 # gather data from specific dates
 col = "Suggestion"
 #var = "BUY"
-cmd = "SELECT * FROM {} WHERE {} LIKE '%{}%'".format(TABLE_NAME,col,var)
+if var == "Both":
+    var = "IN ('{}','{}')".format("BUY","SELL")
+else:
+    var = "LIKE '%{}%'".format(var)
+cmd = "SELECT * FROM {} WHERE {} {}".format(TABLE_NAME,col,var)
 #print(cmd)
 read_table(cmd)
 

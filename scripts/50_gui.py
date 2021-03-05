@@ -7,6 +7,8 @@ import sqlite3
 from sqlite3.dbapi2 import Cursor
 from PyQt5.QtWidgets import QPushButton
 from typing import Text
+# Custom functions
+from py_util import ViewStats
 
 CSS = \
 {
@@ -89,7 +91,7 @@ def dictToCSS(dictionnary):
  
 def create_chart():
     print("Generating chart")
-    pycmd = 'python /home/admin/AlgoProject/scripts/AlphaVantage/41_VisualiseData.py'
+    pycmd = 'python /home/admin/AlgoProject/scripts/41_VisualiseData.py'
     os.system(pycmd)
 
 def show_portfolio():
@@ -101,73 +103,30 @@ def get_stock_data():
     check = input("Are you sure? could take 25 minutes! (y or n) ") or "n"
     if check == "y":
         print("Generating stock suggestion data")
-        pycmd = 'python /home/admin/AlgoProject/scripts/AlphaVantage/02_get_data_sqlite.py'
+        pycmd = 'python /home/admin/AlgoProject/scripts/02_get_data_sqlite.py'
         os.system(pycmd)
     else:
         print("No action taken")
 
 def enter_data():
     print("Enter data...")
-    pycmd = 'python /home/admin/AlgoProject/scripts/AlphaVantage/32_EnterData_sqlite.py'
+    pycmd = 'python /home/admin/AlgoProject/scripts/32_EnterData_sqlite.py'
     os.system(pycmd)
 
-DB_FOLDER = '/home/admin/AlgoProject/scripts/AlphaVantage/db/' 
-DB_NAME = 'pnl.db'
-DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
-connection = sqlite3.connect(DB_NAME)
-cursor = connection.cursor()
-
+#def acdata1(YEAR):
+#    global STATS
+#    STATS = ViewStats.Get_Stats(YEAR)
+# get stat data
+STATS_ALL = ViewStats.Get_Stats(0)  
+STATS_2020 = ViewStats.Get_Stats(2020)  
+STATS_2021 = ViewStats.Get_Stats(2021)
+STATS = """{}
+---
+{}
+------
+{}""".format(STATS_2021,STATS_2020,STATS_ALL)
+#print(STATS)
 # Date,TotalValue,PieValue,Investment,PieInvestment,Realised,Dividend
-
-TABLE_NAME = "pldata"
-#TABLE_NAME = "pldataTEST3"
-# set global variables:
-def read_table(cmd):
-    global results
-    cursor.execute(cmd)
-    results = cursor.fetchall()
-
-def read_table_year(cmd,var):
-    global results
-    cursor.execute(cmd)
-    results = cursor.fetchall()    
-    print(results)
-
-def get_data(DATA):
-    global DENTRYID, DDATE,DTOTAL,DPIE,DINV,DPIEINV,DREAL,DDIV,DVAL,DPER,DPIV 
-    DENTRYID = DATA[0]
-    DDATE = DATA[1]
-    DTOTAL = DATA[2]
-    DPIE = DATA[3]
-    DINV = DATA[4]
-    DPIEINV = DATA[5]
-    DREAL = DATA[6]
-    DDIV = DATA[7]
-    DVAL = DATA[8]
-    DPER = round((((DVAL / DINV)-1)*100) ,1)
-    DPIV = round((((DPIE / DPIEINV)-1)*100) ,1)
-
-# gather data for specific year
-YEAR = 0 # input("Choose year to gather data for (leave blank to gather all data): ") or "0" # ask user to enter year
-
-col = "entry_id"
-cmd = 'SELECT * FROM {} ORDER BY {} DESC LIMIT 1'.format(TABLE_NAME,col) # Get all data
-read_table(cmd)
-DATA = results[0]
-#print(DATA)
-get_data(DATA)
-
-TEXT1 = """Total value of account is €{}
-Realised value is €{}
-Diviend recieved is €{}
-
-Stock value is €{}
-Stock investment is €{}
-Stock value increase is {}%
-
-Pie value is €{}
-Pie investment is €{}
-Pie value increase is {}%""".format(DTOTAL,DREAL,DDIV,DVAL,DINV,DPER,DPIE,DPIEINV,DPIV)
 
 # pop up dialog
 def msgButtonClick(i):
@@ -188,7 +147,7 @@ def showDialog():
 
 def getDataConfirm():
    msgBox = QtWidgets.QMessageBox()
-   z.setIcon(QtWidgets.QMessageBox.Warning)
+   msgBox.setIcon(QtWidgets.QMessageBox.Warning)
    msgBox.setText("""Click ok to continue...""")
    msgBox.setWindowTitle("Run get data script?")
    msgBox.setStandardButtons(QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel)
@@ -218,9 +177,14 @@ class Main(QtWidgets.QMainWindow):
         self.ui.portfolio.clicked.connect(show_portfolio)
         self.ui.portfolio.setFocusPolicy(QtCore.Qt.NoFocus)
 
+        #self.ui.getstats = QtWidgets.QPushButton("Get Stats")
+        #self.ui.getstats.setObjectName("button")
+        #self.ui.getstats.clicked.connect(get_stats) #(showDialog)
+        #self.ui.getstats.setFocusPolicy(QtCore.Qt.NoFocus)
+
         self.ui.createchart = QtWidgets.QPushButton("Create Chart")
         self.ui.createchart.setObjectName("button")
-        self.ui.createchart.clicked.connect(showDialog)
+        self.ui.createchart.clicked.connect(create_chart) #(showDialog)
         self.ui.createchart.setFocusPolicy(QtCore.Qt.NoFocus)
 
         self.ui.enterdata = QtWidgets.QPushButton("Enter data")
@@ -238,22 +202,24 @@ class Main(QtWidgets.QMainWindow):
         self.ui.exitbutton.clicked.connect(self.close)
         self.ui.exitbutton.setFocusPolicy(QtCore.Qt.NoFocus)
 
-        self.ui.acdata1 = QtWidgets.QLabel(TEXT1)
+        self.ui.acdata1 = QtWidgets.QLabel(STATS)
         self.ui.acdata1.setObjectName("acdata")
         self.ui.acdata1.setAlignment(QtCore.Qt.AlignCenter)
 
-        self.ui.layoutmain = QtWidgets.QHBoxLayout() # Horozontal layout that hols the others
+        self.ui.layoutmain = QtWidgets.QHBoxLayout() # Horozontal layout that holds the others
 
+        # Layout 2
         self.ui.layout2 = QtWidgets.QVBoxLayout()
         self.ui.layout2.setContentsMargins(0, 0, 50, 0)
         self.ui.layout2.addWidget(self.ui.label)
-        #self.ui.layout2.addWidget(self.ui.portfolio)
+        #self.ui.layout2.addWidget(self.ui.getstats)
         self.ui.layout2.addWidget(self.ui.createchart)
         self.ui.layout2.addWidget(self.ui.enterdata)
         self.ui.layout2.addWidget(self.ui.getdata)
         self.ui.layout2.addWidget(self.ui.exitbutton)
         #self.ui.setLayout(self.ui.layout2)
 
+        # Layout 3
         self.ui.layout3 = QtWidgets.QVBoxLayout()
         self.ui.layout3.setContentsMargins(0, 0, 50, 0)
         self.ui.layout3.addWidget(self.ui.acdata1)
