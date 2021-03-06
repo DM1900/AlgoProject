@@ -3,6 +3,7 @@
 # The data is gathered from Alpha Vantage which has a delay of 1 day on all stock data.
 # Please factor that into any tradng decisions (this is based on Daily RSI so it's not such a big issue here)
 #
+
 # imports:
 from datetime import datetime, timedelta
 import pandas as pd
@@ -16,11 +17,18 @@ import time
 import csv
 import sqlite3
 from sqlite3.dbapi2 import Cursor
+# custom functions
 from py_util import AV_func
 from py_util import SQLITE_func
+from py_util import pylog as log
 
-#
+# Log variables:
+LOGTIME = datetime.now().strftime("%Y%m%d-%H")
+LOGFILE = "/home/admin/AlgoProject/logs/"
+LOGFILE = LOGFILE + "Log_{}.log".format(LOGTIME)
+
 START = datetime.now()
+log.WriteToLog(LOGFILE,"Starting script at {}".format(START))
 #
 # create sql table
 # define connection & cursor
@@ -34,8 +42,7 @@ cursor = connection.cursor()
 TABLE_DATE = datetime.now().strftime("%Y%m%d_%H")
 TABLE_NAME = "StockData_{}".format(TABLE_DATE)
 #TABLE_NAME = "StockData_20210215_test4"
-
-
+log.WriteToLog(LOGFILE,"{} {}".format(DB_NAME,TABLE_NAME))
 # Create new Database Table
 SQLITE_func.CreateDB(DB_NAME,TABLE_NAME)
 
@@ -51,7 +58,7 @@ RSIVLOW = 20
 RSILOW = 45
 RSIHIGH = 65
 RSIVHIGH = 80
-print("RSI settings: Period: {} days, Low: {}, High {}".format(RSI_PERIOD,RSILOW,RSIHIGH))
+log.WriteToLog(LOGFILE,"RSI settings: Period: {} days, Low: {}, High {}".format(RSI_PERIOD,RSILOW,RSIHIGH))
 # RSI Suggestions
 BUY = "BUY"
 BUYRSI = "BUY (RSI very low)"
@@ -66,21 +73,20 @@ WAITERR = 6
 KEYS = "/home/admin/AlgoProject/scripts/keys/keys.txt" 
 #
 # this is the mian one with all tickers
-tickerlist = "tickerfile_TRADELIST.txt" # main list of all selected tickers
-#tickerlist = "tickerfile_TEST.txt"
-#tickerlist = "tickerfile_TEST_USA.txt"
+log.WriteToLog(LOGFILE,"Set ticker list")
+tickers = "tickerfile_TRADELIST.txt" # main list of all selected tickers
+#tickers = "tickerfile_TEST.txt"
+#tickers = "tickerfile_TEST_USA.txt"
 #
-tickerlist = "tickers/AV/{}".format(tickerlist)
+tickerlist = "/home/admin/AlgoProject/tickers/AV/{}".format(tickers)
 #
-print(tickerlist)
+log.WriteToLog(LOGFILE,tickerlist)
 with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
 
-# tickers = ['AAPL']
-
+#tickers = ['AAPL']
 
 df2 = pd.DataFrame(columns=[])  # create empty dataframe
-print(datetime.now())
 
 def get_data(ticker):
     try:
@@ -88,9 +94,8 @@ def get_data(ticker):
         TEMPdf = pd.DataFrame()
         df = pd.DataFrame()
         global df2
-        print(ticker)
+        #log.WriteToLog(LOGFILE,ticker)
         # Price data
-        print("Get price data")
         SUCCESS = 0
         DCHANGE = 0
         while SUCCESS < 10:
@@ -102,25 +107,21 @@ def get_data(ticker):
                 TEMPdf = df.append(data)
                 DTICKER = TEMPdf.iat[0,0]
                 DTICKER = '"{}"'.format(DTICKER)
-                print("Getting data for {}".format(DTICKER))
-                #print(DTICKER)
+                log.WriteToLog(LOGFILE,"Getting data for {}".format(DTICKER))
                 DPRICE = TEMPdf.iat[0,4]
-                #print(DPRICE)
                 DCLOSE = TEMPdf.iat[0,7]
-                #print(DCLOSE)
                 DCHANGE = TEMPdf.iat[0,9]
                 DCHANGE = '"{}"'.format(DCHANGE)
-                #print(DCHANGE)
                 TEMPdf = pd.DataFrame() # create empty dataframe
                 SUCCESS=True
                 break
             except:
-                print("{} - Price exception".format(ticker))
+                log.WriteToLog(LOGFILE,"{} - Price exception".format(ticker))
                 SUCCESS=SUCCESS + 1
-                print("{} - Error found, {}, attempt no. {}. ({})".format(DCHANGE, DCHANGE, SUCCESS, APIkey))
+                log.WriteToLog(LOGFILE,"{} - Error found, {}, attempt no. {}. ({})".format(DCHANGE, DCHANGE, SUCCESS, APIkey))
                 time.sleep(WAITERR)
         # RSI data
-        print("Get RSI data")
+        log.WriteToLog(LOGFILE,"Get RSI data for {}".format(DTICKER))
         #SUCCESS = 0
         while SUCCESS < 10:
             try:
@@ -132,38 +133,34 @@ def get_data(ticker):
                 TEMPdf = TEMPdf.append(dataRSI)
                 RS = TEMPdf.last('1D')
                 RS = RS.iat[0,0]
-                #print(RS)
                 RSR = round(RS,2)
-                #print(RSR)
-                #df['RSI'] = RSR
                 # suggest buy/sell based on RSI & price action
                 # #def GetSuggestion(RS,DCLOSE,DPRICE,BUY,SELL,HOLD,RSIHIGH,RSIVHIGH,RSILOW,RSIVLOW):
                 SUGGESTION = AV_func.GetSuggestion(RS,DCLOSE,DPRICE,BUY,SELL,HOLD,RSIHIGH,RSIVHIGH,RSILOW,RSIVLOW)
                 SUGGESTION = '"{}"'.format(SUGGESTION)
-                print(SUGGESTION)
+                #log.WriteToLog(LOGFILE,"Suggestion for {}: {}".format(ticker,SUGGESTION))
                 #df2 = df2.append(df)
                 break
                 #logging.info(df2)
             except:
-                print("{} - RSI exception".format(ticker))
+                log.WriteToLog(LOGFILE,"{} - RSI exception".format(ticker))
                 SUCCESS=SUCCESS + 1
-                print("{} - Error found, {}, attempt no. {}. ({})".format(ticker, "RSI", SUCCESS, APIkey))
+                log.WriteToLog(LOGFILE,"{} - Error found, {}, attempt no. {}. ({})".format(ticker, "RSI", SUCCESS, APIkey))
                 time.sleep(WAITERR)
         INSERT_CMD = "INSERT INTO {} VALUES (NULL,{},{},{},{},{},{},{},NULL)".format(TABLE_NAME,DDATE,DTICKER,DPRICE,DCLOSE,DCHANGE,RSR,SUGGESTION)
-        #print("Print INSERT_CMD")
-        print(INSERT_CMD)
+        log.WriteToLog(LOGFILE,INSERT_CMD)
         cursor.execute(INSERT_CMD)
         connection.commit()
     except: # catch all exceptions in the same way
-        print("Main Error catch")
-        print("{} - Error found, {}, attempting to continue...".format(ticker, "Main Error catch"))
+        log.WriteToLog(LOGFILE,"Main Error catch {}".format(ticker))
+        log.WriteToLog(LOGFILE,"{} - Error found, {}, attempting to continue...".format(ticker, "Main Error catch"))
 
 try:
-    print("get_data has been set, running it now...")
+    log.WriteToLog(LOGFILE,"get_data has been set, running it now...")
     for ticker in tickers:
         get_data(ticker)
 except: # catch all exceptions in the same way
-    print("Error running get_data loop")
+    log.WriteToLog(LOGFILE,"Error running get_data loop")
 
 
 # read the newly created table
@@ -178,10 +175,10 @@ cmd = "SELECT * FROM {}".format(TABLE_NAME)
 # finish up
 # #df2 = df2.read_csv(CSV_FILE)
 FINISH = datetime.now()
-print(FINISH)
+log.WriteToLog(LOGFILE,FINISH)
 TIMETAKEN = FINISH - START
-print("Time taken to run the script: {}".format(TIMETAKEN))
-print("End")
+log.WriteToLog(LOGFILE,"Time taken to run the script: {}".format(TIMETAKEN))
+log.WriteToLog(LOGFILE,"END")
 
 #https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=LON:BP.L&apikey=T36W24357QF5Z698
 #https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=AAPL&interval=5min&apikey=T36W24357QF5Z698

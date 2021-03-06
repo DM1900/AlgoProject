@@ -13,3 +13,5 @@ Algorithm Project
 * Linux machine
 * Python 
 
+### To open the GUI:
+Point python to 50_gui.py

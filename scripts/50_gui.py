@@ -14,12 +14,13 @@ CSS = \
 {
     'QWidget':
     {
-        'background-color': '#333333',
+        #'background-color': '#333333',
+        'background-color': '#34495e',
     },
     'QLabel#label':
     {
         'color': 'white',
-        'background-color': '#1d90cd',
+        #'background-color': '#2980b9',
         'font-weight': 'bold',
         'padding': '15px',
         'font-family': 'Arial, Helvetica, sans-serif',
@@ -35,8 +36,8 @@ CSS = \
 
     'QPushButton#button':
     {
-        'color': '#888888',
-        'background-color': '#444444',
+        'color': '#ecf0f1',
+        'background-color': '#95a5a6',
         'font-weight': 'bold',
         'border': 'none',
         'padding': '25px',
@@ -44,11 +45,11 @@ CSS = \
     },
     'QPushButton#button:active':
     {
-        'color': '#ffffff',
+        'color': 'white',
     },
     'QPushButton#button:hover':
     {
-        'color': '#1d90cd',
+        'color': '#34495e',
     },
 
     'QPushButton#exitbutton':
@@ -66,17 +67,19 @@ CSS = \
     },
     'QPushButton#exitbutton:hover':
     {
-        'color': 'red',
+        'color': 'white',
+        'background-color': '#e74c3c',
     },
 
     'QLabel#acdata':
     {
-        'color': '#ffffff',
-        'background-color': '#444444',
-        'font-weight': 'bold',
+        'color': '#444444',
+        'background-color': '#ffffff',
+        #'font-weight': 'bold',
         'border': 'none',
         'padding': '25px',
         'font-family': 'Arial, Helvetica, sans-serif',
+        'text-align': 'left',
     },
 }
  
@@ -117,15 +120,19 @@ def enter_data():
 #    global STATS
 #    STATS = ViewStats.Get_Stats(YEAR)
 # get stat data
-STATS_ALL = ViewStats.Get_Stats(0)  
-STATS_2020 = ViewStats.Get_Stats(2020)  
-STATS_2021 = ViewStats.Get_Stats(2021)
-STATS = """{}
----
-{}
-------
-{}""".format(STATS_2021,STATS_2020,STATS_ALL)
-#print(STATS)
+def Get_Stats():
+    global STATS
+    STATS_ALL = ViewStats.Get_Stats(0)  
+    STATS_2020 = ViewStats.Get_Stats(2020)  
+    STATS_2021 = ViewStats.Get_Stats(2021)
+    STATS = """{}
+    ---
+    {}
+    ------
+    {}""".format(STATS_2021,STATS_2020,STATS_ALL)
+
+Get_Stats()
+
 # Date,TotalValue,PieValue,Investment,PieInvestment,Realised,Dividend
 
 # pop up dialog

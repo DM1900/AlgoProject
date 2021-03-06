@@ -1,6 +1,0 @@
-21/02/2021 14:12:17
-attempting to run getdata script from Cron
-/usr/bin/python /home/admin/AlgoProject/scripts/AlphaVantage/02_get_data_sqlite.py
-21/02/2021 14:12:32
-attempting to run getdata script from Cron
-/usr/bin/python /home/admin/AlgoProject/scripts/AlphaVantage/02_get_data_sqlite.py

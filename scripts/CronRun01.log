@@ -1,22 +1,12 @@
-Start 2021-02-12 11:05:01.977488, Finish 2021-02-12 11:05:03.979659, Total 0:00:02.002171This is a test
-test
+06/03/2021 08:17:33
 attempting to run getdata script from Cron
-/usr/bin/python /home/admin/AlgoProject/scripts/AlphaVantage/02_get_data_sqlite.py
-21/02/2021 14:10:32
+/usr/bin/python /home/admin/AlgoProject/scripts/02_get_data_sqlite.py
+06/03/2021 08:19:01
 attempting to run getdata script from Cron
-/usr/bin/python /home/admin/AlgoProject/scripts/AlphaVantage/02_get_data_sqlite.py
-21/02/2021 14:13:26
+/usr/bin/python /home/admin/AlgoProject/scripts/02_get_data_sqlite.py
+06/03/2021 08:22:02
 attempting to run getdata script from Cron
-/usr/bin/python /home/admin/AlgoProject/scripts/AlphaVantage/02_get_data_sqlite.py
-21/02/2021 14:15:01
+/usr/bin/python /home/admin/AlgoProject/scripts/02_get_data_sqlite.py
+06/03/2021 08:25:01
 attempting to run getdata script from Cron
-/usr/bin/python /home/admin/AlgoProject/scripts/AlphaVantage/02_get_data_sqlite.py
-21/02/2021 14:16:02
-attempting to run getdata script from Cron
-/usr/bin/python /home/admin/AlgoProject/scripts/AlphaVantage/02_get_data_sqlite.py
-21/02/2021 14:19:01
-attempting to run getdata script from Cron
-/usr/bin/python /home/admin/AlgoProject/scripts/AlphaVantage/02_get_data_sqlite.py
-21/02/2021 14:20:40
-attempting to run getdata script from Cron
-/usr/bin/python /home/admin/AlgoProject/scripts/AlphaVantage/02_get_data_sqlite.py
+/usr/bin/python /home/admin/AlgoProject/scripts/02_get_data_sqlite.py
