@@ -5,8 +5,8 @@ old/
 output/
 logs/
 testing/
-scripts/AlphaVantage/keys/keys.txt
+scripts/keys/keys.txt
 # exclude databases:
-scripts/AlphaVantage/db/
+scripts/db/
 # exclude output data:
-scripts/AlphaVantage/output/
+scripts/output/
