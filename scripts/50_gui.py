@@ -5,10 +5,13 @@ import sys
 import os
 import sqlite3
 from sqlite3.dbapi2 import Cursor
-from PyQt5.QtWidgets import QPushButton
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import  *
 from typing import Text
 # Custom functions
 from py_util import ViewStats
+from py_util import SQLITE_func
 
 CSS = \
 {
@@ -31,6 +34,15 @@ CSS = \
         'font': 'georgia',
         'font-weight': 'bold',
         'font-size': '16px',
+        'font-family': 'Arial, Helvetica, sans-serif',
+    },
+
+    'QLabel#table':
+    {
+        'color': 'white',
+        #'background-color': '#2980b9',
+        'font-weight': 'bold',
+        'padding': '15px',
         'font-family': 'Arial, Helvetica, sans-serif',
     },
 
@@ -125,6 +137,7 @@ def Get_Stats():
     STATS_ALL = ViewStats.Get_Stats(0)  
     STATS_2020 = ViewStats.Get_Stats(2020)  
     STATS_2021 = ViewStats.Get_Stats(2021)
+
     STATS = """{}
     ---
     {}
@@ -133,6 +146,9 @@ def Get_Stats():
 
 Get_Stats()
 
+# Get Suggestions:
+SUGG = SQLITE_func.GetSuggestions("Both")
+data = "SUGG"
 # Date,TotalValue,PieValue,Investment,PieInvestment,Realised,Dividend
 
 # pop up dialog
@@ -212,6 +228,7 @@ class Main(QtWidgets.QMainWindow):
         self.ui.acdata1 = QtWidgets.QLabel(STATS)
         self.ui.acdata1.setObjectName("acdata")
         self.ui.acdata1.setAlignment(QtCore.Qt.AlignCenter)
+
 
         self.ui.layoutmain = QtWidgets.QHBoxLayout() # Horozontal layout that holds the others
 

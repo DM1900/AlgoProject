@@ -1,0 +1,39 @@
+QLabel {{
+    color: {QTMATERIAL_PRIMARYCOLOR};
+    text-transform: none;
+  }}
+  
+  .big_button {{
+    height: 64px;
+  }}
+
+QPushButton {{
+    color: {QTMATERIAL_PRIMARYCOLOR};
+    text-transform: none;
+    background-color: {QTMATERIAL_SECONDARYCOLOR};
+  }}
+  
+  .big_button {{
+    height: 64px;
+  }}
+
+QPushButton:hover {{
+    color: {QTMATERIAL_SECONDARYCOLOR};
+    text-transform: none;
+    background-color: {QTMATERIAL_PRIMARYCOLOR};
+  }}
+  
+  .big_button {{
+    height: 64px;
+  }}
+
+
+QPushButton#exitbutton:hover {{
+    color: {QTMATERIAL_SECONDARYCOLOR};
+    text-transform: none;
+    background-color: #ff5147;
+  }}
+  
+  .big_button {{
+    height: 64px;
+  }}

@@ -10,3 +10,6 @@ attempting to run getdata script from Cron
 06/03/2021 08:25:01
 attempting to run getdata script from Cron
 /usr/bin/python /home/admin/AlgoProject/scripts/02_get_data_sqlite.py
+09/03/2021 00:25:01
+attempting to run getdata script from Cron
+/usr/bin/python /home/admin/AlgoProject/scripts/02_get_data_sqlite.py

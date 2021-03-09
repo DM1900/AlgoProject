@@ -5,7 +5,7 @@ import sqlite3
 from sqlite3.dbapi2 import Cursor
 
 # define connection & cursor
-DB_FOLDER = '/home/admin/AlgoProject/scripts/AlphaVantage/db/' 
+DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
 DB_NAME = 'pnl.db'
 DB_NAME = 'StockData.db'
 
@@ -35,7 +35,7 @@ command1 = """CREATE TABLE IF NOT EXISTS pldata (
 # table name
 
 
-TABLE_NAME = "StockData_20210221_14"
+TABLE_NAME = "StockData_20210306_08"
 
 # read table
 def read_table(cmd):
@@ -51,16 +51,16 @@ cmd = "SELECT * FROM {}".format(TABLE_NAME)
 col = "Ticker"
 var = "AAPL"
 cmd = "SELECT * FROM {} WHERE {} LIKE '%{}%'".format(TABLE_NAME,col,var)
-read_table(cmd)
+#read_table(cmd)
 
 #exit()
 
 # Delete row from table
 COL = "entry_id"
-VAL = 4
+VAL = 7
 cmd = "DELETE FROM {} WHERE {} = {}".format(TABLE_NAME,COL,VAL)
-#cursor.execute(cmd)
-#connection.commit()
+cursor.execute(cmd)
+connection.commit()
 
 
 #n = 1_

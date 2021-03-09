@@ -9,6 +9,12 @@ import sqlite3
 from sqlite3.dbapi2 import Cursor
 from datetime import datetime, timedelta
 
+CHECK = input("Do you want to enter data? y or n ")
+if CHECK == "n":
+    exit()
+else:
+    print("Continue...")
+
 # define connection & cursor
 DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
 DB_NAME = 'pnl.db'
