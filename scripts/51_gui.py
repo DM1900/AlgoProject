@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+import pandas as pd
 # Custom functions
 from py_util import ViewStats
 from py_util import SQLITE_func
@@ -11,32 +12,23 @@ from py_util import SQLITE_func
 from qt_material import apply_stylesheet
 
 class RuntimeStylesheets(QMainWindow):
-    # ----------------------------------------------------------------------
     def __init__(self):
         """"""
         super().__init__()
         self.main = QUiLoader().load('main_window.ui', self)
         self.main.pushButton_2.setProperty('class', 'big_button')
 
-
-
-def Get_Stats():
+# stats:
+def Get_Stats(choice):
     global STATS
-    STATS_ALL = ViewStats.Get_Stats(0)  
-    STATS_2020 = ViewStats.Get_Stats(2020)  
-    STATS_2021 = ViewStats.Get_Stats(2021)
-
-    STATS = """{}
----
-{}
-------
-{}""".format(STATS_2021,STATS_2020,STATS_ALL)
+    STATSVALUE = ViewStats.Get_Stats(choice)
+    STATS = """{}""".format(STATSVALUE)
 
 class StatsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
 
-        Get_Stats()
+        Get_Stats(CHOICE)
 
         self.setWindowTitle("STATS!")
 
@@ -56,11 +48,10 @@ class StatsDialog(QDialog):
 class ChoiceDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
+        self.setFixedSize(360, 620)
 
         SUGG = SQLITE_func.GetSuggestions(CHOICE)
-        SUGG = """{}""".format(SUGG)
-        print("**{}*{}".format(CHOICE,SUGG))
-
+        df = pd.DataFrame(SUGG)
         self.setWindowTitle("Trading Suggestions!")
 
         QBtn = QDialogButtonBox.Ok #| QDialogButtonBox.Cancel
@@ -72,78 +63,37 @@ class ChoiceDialog(QDialog):
         self.layout = QVBoxLayout()
         
         message1 = QLabel(CHOICE)
-        message2 = QLabel(SUGG)
+
+        class pandasModel(QAbstractTableModel):
+            def __init__(self, data):
+                QAbstractTableModel.__init__(self)
+                self._data = data
+
+            def rowCount(self, parent=None):
+                return self._data.shape[0]
+
+            def columnCount(self, parnet=None):
+                return self._data.shape[1]
+
+            def data(self, index, role=Qt.DisplayRole):
+                if index.isValid():
+                    if role == Qt.DisplayRole:
+                        return str(self._data.iloc[index.row(), index.column()])
+                return None
+
+            def headerData(self, col, orientation, role):
+                if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+                    return self._data.columns[col]
+                return None
+
+        model = pandasModel(df)
+        view = QTableView()
+        view.setModel(model)
 
         self.layout.addWidget(message1)
-        self.layout.addWidget(message2)
-
+        self.layout.addWidget(view)
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
-
-class SuggDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent=parent)
-
-        self.setWindowTitle("Trading Suggestions!")
-
-        QBtn = QDialogButtonBox.Close #| QDialogButtonBox.Ok 
-
-        self.buttonBox = QDialogButtonBox(QBtn)
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
-
-        self.layout = QVBoxLayout()
-        
-        #message = QLabel(SUGG)
-        message = QLabel("Select which suggestions to view:")
-
-        buy = QPushButton("Buy")
-        buy.clicked.connect(self.button_clicked_buy)
-
-        sell = QPushButton("Sell")
-        sell.clicked.connect(self.button_clicked_sell)
-
-        both = QPushButton("Both")
-        both.clicked.connect(self.button_clicked_both)
-
-        self.layout.addWidget(message)
-        self.layout.addWidget(buy)
-        self.layout.addWidget(sell)
-        self.layout.addWidget(both)
-        self.layout.addWidget(self.buttonBox)
-        self.setLayout(self.layout)
-
-    def button_clicked_buy(self, s):
-        global CHOICE
-        print("click", s)
-        CHOICE = "BUY"
-        dlg = ChoiceDialog()  # If you pass self, the dialog will be centered over the main window as before.
-        if dlg.exec_():
-            print("buySuccess!")
-        else:
-            print("Cancel!")
-
-    def button_clicked_sell(self, s):
-        global CHOICE
-        print("click", s)
-        CHOICE = "SELL"
-        dlg = ChoiceDialog()  # If you pass self, the dialog will be centered over the main window as before.
-        if dlg.exec_():
-            print("sellSuccess!")
-        else:
-            print("Cancel!")
-
-    def button_clicked_both(self, s):
-        global CHOICE
-        print("click", s)
-        CHOICE = "Both"
-        dlg = ChoiceDialog()  # If you pass self, the dialog will be centered over the main window as before.
-        if dlg.exec_():
-            print("bothSuccess!")
-        else:
-            print("Cancel!")
-
-
 
 
 
@@ -246,12 +196,6 @@ class MainWindow(QMainWindow):
         mainlabel.setFont(font)
         mainlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
 
-        showdata = QPushButton("Show account stats")
-        showdata.clicked.connect(self.button_clicked)
-
-        showsugg = QPushButton("Show Trading Suggestions")
-        showsugg.clicked.connect(self.button_clicked_sugg)
-
         enterdata = QPushButton("Enter Data")
         enterdata.clicked.connect(enter_data)
 
@@ -262,11 +206,64 @@ class MainWindow(QMainWindow):
         exitbutton.setObjectName("exitbutton")
         exitbutton.clicked.connect(self.close)
             
-        layout = QVBoxLayout()
+        layout = QVBoxLayout() 
+
+        # Layout 2
+        layout2 = QHBoxLayout()
+
+        statslabel = QLabel("Stats:")
+        statsfont = statslabel.font()
+        statsfont.setPointSize(20)
+        statslabel.setFont(font)
+        statslabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+
+        allstats = QPushButton("All Stats")
+        allstats.clicked.connect(self.button_clicked_all)
+        ttstats = QPushButton("2020")
+        ttstats.clicked.connect(self.button_clicked_2020)
+        ttostats = QPushButton("2021")
+        ttostats.clicked.connect(self.button_clicked_2021)
+
+        layout2.addWidget(statslabel)
+        layout2.addWidget(allstats)
+        layout2.addWidget(ttstats)
+        layout2.addWidget(ttostats)
+
+        # Layout 3
+        # Trade suggestions
+        #buttonBox = QDialogButtonBox(QBtn)
+        #self.buttonBox.accepted.connect(self.accept)
+        #self.buttonBox.rejected.connect(self.reject)
+
+        layout3 = QHBoxLayout()
+        
+        #message = QLabel(SUGG)
+        tradelabel = QLabel("Trade:")
+        statsfont = tradelabel.font()
+        statsfont.setPointSize(20)
+        tradelabel.setFont(font)
+        tradelabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+
+        buy = QPushButton("Buy")
+        buy.clicked.connect(self.button_clicked_buy)
+
+        sell = QPushButton("Sell")
+        sell.clicked.connect(self.button_clicked_sell)
+
+        both = QPushButton("Both")
+        both.clicked.connect(self.button_clicked_both)
+
+        layout3.addWidget(tradelabel)
+        layout3.addWidget(buy)
+        layout3.addWidget(sell)
+        layout3.addWidget(both)
+
 
         layout.addWidget(mainlabel)
-        layout.addWidget(showdata)
-        layout.addWidget(showsugg)
+        #layout.addWidget(showdata)
+        layout.addLayout(layout2)
+        #layout.addWidget(showsugg)
+        layout.addLayout(layout3)
         layout.addWidget(enterdata)
         layout.addWidget(createchart)
         layout.addWidget(exitbutton)
@@ -275,12 +272,72 @@ class MainWindow(QMainWindow):
         widget.setLayout(layout)
         self.setCentralWidget(widget)
 
+    def button_clicked_buy(self, s):
+        global CHOICE
+        print("click", s)
+        CHOICE = "BUY"
+        dlg = ChoiceDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("buySuccess!")
+        else:
+            print("Cancel!")
+
+    def button_clicked_sell(self, s):
+        global CHOICE
+        print("click", s)
+        CHOICE = "SELL"
+        dlg = ChoiceDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("sellSuccess!")
+        else:
+            print("Cancel!")
+
+    def button_clicked_both(self, s):
+        global CHOICE
+        print("click", s)
+        CHOICE = "Both"
+        dlg = ChoiceDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("bothSuccess!")
+        else:
+            print("Cancel!")
+
     def button_clicked(self, s):
         print("click", s)
 
         dlg = StatsDialog()  # If you pass self, the dialog will be centered over the main window as before.
         if dlg.exec_():
             print("Success!")
+        else:
+            print("Cancel!")
+
+    def button_clicked_all(self, s):
+        global CHOICE
+        CHOICE = 0
+        print("click", s, CHOICE)
+        dlg = StatsDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("Success! {}".format(CHOICE))
+        else:
+            print("Cancel!")
+
+    def button_clicked_2020(self, s):
+        global CHOICE
+        CHOICE = 2020
+        print("click", s, CHOICE)
+        dlg = StatsDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("Success! {}".format(CHOICE))
+        else:
+            print("Cancel!")
+
+    def button_clicked_2021(self, s):
+        global CHOICE
+        CHOICE = 2021
+        print("click", s, CHOICE)
+        dlg = StatsDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("Success! {}".format(CHOICE))
         else:
             print("Cancel!")
 
@@ -304,13 +361,12 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    #app.setStyle('Fusion')
 
     window = MainWindow()
 
     # setup stylesheet
-    #['dark_amber.xml', 'dark_blue.xml', 'dark_cyan.xml', 'dark_lightgreen.xml', 'dark_pink.xml', 'dark_purple.xml', 'dark_red.xml', 'dark_teal.xml', 'dark_yellow.xml', 'light_amber.xml', 'light_blue.xml', 'light_cyan.xml', 'light_cyan_500.xml', 'light_lightgreen.xml', 'light_pink.xml', 'light_purple.xml', 'light_red.xml', 'light_teal.xml', 'light_yellow.xml']
-
+    #['dark_amber.xml', 'dark_blue.xml', 'dark_cyan.xml', 'dark_lightgreen.xml', 'dark_pink.xml', 'dark_purple.xml', 'dark_red.xml', 'dark_teal.xml', 'dark_yellow.xml', 
+    # 'light_amber.xml', 'light_blue.xml', 'light_cyan.xml', 'light_cyan_500.xml', 'light_lightgreen.xml', 'light_pink.xml', 'light_purple.xml', 'light_red.xml', 'light_teal.xml', 'light_yellow.xml']
     apply_stylesheet(app, theme='light_blue.xml')
     stylesheet = app.styleSheet()
     # app.setStyleSheet(stylesheet + "QPushButton{color: red; text-transform: none;}")

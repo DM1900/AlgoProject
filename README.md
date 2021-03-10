@@ -1,5 +1,5 @@
 # AlgoProject
-Algorithm Project
+Algorithm Project 🚀
 ===
 
 ## Data
@@ -8,10 +8,9 @@ Algorithm Project
 * Get RSI data
 * Get RSI data + buy/sell  
 
-## Presentation
-##### Requirements for presenting the data on a web page
+##### Requirements 
 * Linux machine
 * Python 
 
-### To open the GUI:
-Point python to 50_gui.py
+#### To open the GUI:
+* Point python to 51_gui.py

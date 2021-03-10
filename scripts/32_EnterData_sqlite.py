@@ -34,16 +34,11 @@ def enter_data():
     DATE = datetime.now().strftime("%d/%m/%Y") # "%Y%m%d-%H%M") # input("Enter the date (dd/mm/yyyy): ") 
     print("Enter data for {}".format(DATE))
     TotalValue = float(input("Enter total account value: "))
-    PieValue = float(input("Enter Pie value: "))
-    #Investment = input("Enter invested amount: ") 
     tmp = float(LASTROW[4])
     print("Invested amount is €{}, any change?: ".format(tmp))
     Investment = float(input("Enter additional ammount here or leave blank: ") or "0")
     Investment = float(tmp) + Investment
     tmp = float(LASTROW[5])
-    print("Pie Invested amount is €{}, any change?: ".format(tmp))
-    PieInvestment = float(input("Enter additional ammount here or leave blank: ") or "0")
-    PieInvestment = tmp + PieInvestment
     tmp = LASTROW[6]
     Realised = input("Enter Realised value (current value €{}): ".format(tmp))
     if Realised == "":
@@ -53,8 +48,8 @@ def enter_data():
     if Dividend == "":
         Dividend = tmp
     DATE = '"{}"'.format(DATE)
-    InvValue = TotalValue - PieInvestment
-    INSERT_CMD = "INSERT INTO pldata VALUES (NULL,{},{},{},{},{},{},{},{})".format(DATE,TotalValue,PieValue,Investment,PieInvestment,Realised,Dividend,InvValue)
+    InvValue = TotalValue #- PieInvestment
+    INSERT_CMD = "INSERT INTO pldata VALUES (NULL,{},{},{},{},{},{},{},{})".format(DATE,TotalValue,0,Investment,0,Realised,Dividend,InvValue)
     print(INSERT_CMD)
     cursor.execute(INSERT_CMD)
     connection.commit()
