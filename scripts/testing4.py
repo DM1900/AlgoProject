@@ -1,165 +1,380 @@
-#!/usr/bin/python3.9
-# DerekM - 2021
+import sys
+import os
+from datetime import datetime, timedelta
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+import pandas as pd
+# Custom functions
+from py_util import ViewStats
+from py_util import SQLITE_func
+#
+from qt_material import apply_stylesheet
 
-import tkinter as tk
-#from tkinter import ttk
-import tkinter.ttk as ttk
-from ttkthemes import ThemedStyle 
-from ttkthemes import ThemedTk
+class RuntimeStylesheets(QMainWindow):
+    def __init__(self):
+        """"""
+        super().__init__()
+        self.main = QUiLoader().load('main_window.ui', self)
+        self.main.pushButton_2.setProperty('class', 'big_button')
 
-import sqlite3
-from sqlite3.dbapi2 import Cursor
-from typing import Text
+# stats:
+def Get_Stats(choice):
+    global STATS
+    STATSVALUE = ViewStats.Get_Stats(choice)
+    print(STATSVALUE)
+    STATS = """{}""".format(STATSVALUE)
 
-"""
-window = ThemedTk(theme="itft1")
-ttk.Button(window, text="Quit", command=window.destroy).pack()
-window.mainloop()
+class StatsDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
 
-#greeting = tk.Label(text="Hello, Tkinter")
-greeting = ThemedTk(theme="itft1")
-#greeting.pack()
-ttk.Button(greeting,text="Click me!").pack()
-greeting.mainloop()
-"""
+        Get_Stats(CHOICE) # returns a variable STATS
 
+        self.setWindowTitle("STATS!")
 
-# change theme:
-#s = ttk.Style()
-#s.theme_use('alt')
-#s.theme_use('clam')
+        QBtn = QDialogButtonBox.Ok #| QDialogButtonBox.Cancel
 
-#themes = s.theme_use()
-#print(themes)
+        self.buttonBox = QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
 
-# define connection & cursor
-DB_FOLDER = '/home/admin/AlgoProject/scripts/AlphaVantage/db/' 
-DB_NAME = 'pnl.db'
-DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
-connection = sqlite3.connect(DB_NAME)
-cursor = connection.cursor()
+        self.layout = QVBoxLayout()
+        message = QLabel(STATS)
+        self.layout.addWidget(message)
+        self.layout.addWidget(self.buttonBox)
+        self.setLayout(self.layout)
 
-# Date,TotalValue,PieValue,Investment,PieInvestment,Realised,Dividend
+# suggestions:
 
-TABLE_NAME = "pldata"
-#TABLE_NAME = "pldataTEST3"
+class pandasModel(QAbstractTableModel):
+    def __init__(self, data):
+        QAbstractTableModel.__init__(self)
+        self._data = data
 
-def read_table(cmd):
-    global results
-    cursor.execute(cmd)
-    results = cursor.fetchall()
-    
-# gather data from specific dates
-col = "entry_id"
-cmd = 'SELECT * FROM {} ORDER BY {} DESC LIMIT 1'.format(TABLE_NAME,col)
+    def rowCount(self, parent=None):
+        return self._data.shape[0]
 
-read_table(cmd)
-DATA = results[0]
-DENTRYID = DATA[0]
-DDATE = DATA[1]
-DTOTAL = DATA[2]
-DPIE = DATA[3]
-DINV = DATA[4]
-DPIEINV = DATA[5]
-DREAL = DATA[6]
-DDIV = DATA[7]
-DVAL = DATA[8]
+    def columnCount(self, parnet=None):
+        return self._data.shape[1]
 
-DPER = round((((DVAL / DINV)-1)*100) ,1)
-DPIV = round((((DPIE / DPIEINV)-1)*100) ,1)
-###
-print("Try to create tkinter window")
+    def data(self, index, role=Qt.DisplayRole):
+        if index.isValid():
+            if role == Qt.DisplayRole:
+                return str(self._data.iloc[index.row(), index.column()])
+        return None
 
-window = ThemedTk(theme="itft1")
-ttk.Button(window, text="Quit", command=window.destroy).pack()
-window.mainloop()
+    def headerData(self, col, orientation, role):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return self._data.columns[col]
+        return None
 
-#window = tk.Tk()
-info = "Account Data {}".format(DDATE)
-window.title(info)
+class ChoiceDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+        self.setFixedSize(self.layout.sizeHint())
 
-frame_a = ttk.Frame()
-frame_b = ttk.Frame()
-frame_c = ttk.Frame()
+        SUGG = SQLITE_func.GetSuggestions(CHOICE)
+        df = pd.DataFrame(SUGG)
+        self.setWindowTitle("Trading Suggestions!")
 
-TEXT = """Total value of account is €{}
-Realised value is €{}
-Diviend recieved is €{}""".format(DTOTAL,DREAL,DDIV)
-label_a = tk.Label(master=frame_a, text=TEXT)
-label_a.pack()
+        QBtn = QDialogButtonBox.Ok #| QDialogButtonBox.Cancel
 
-TEXT = """Stock value is €{}
-Stock investment is €{}
-Stock value increase is {}%""".format(DVAL,DINV,DPER)
-label_b = tk.Label(master=frame_b, text=TEXT)
-label_b.pack()
+        self.buttonBox = QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
 
-TEXT = """Pie value is €{}
-Pie investment is €{}
-Pie value increase is {}%""".format(DPIE,DPIEINV,DPIV)
-label_c = tk.Label(master=frame_c, text=TEXT)
-label_c.pack()
+        self.layout = QVBoxLayout()
+        
+        message1 = QLabel(CHOICE)
 
 
-frame_a.pack()
-frame_b.pack()
-frame_c.pack()
+        model = pandasModel(df)
+        view = QTableView()
+        view.setModel(model)
 
-window.mainloop()
-
-#exit()
+        self.layout.addWidget(message1)
+        self.layout.addWidget(view)
+        self.layout.addWidget(self.buttonBox)
+        self.setLayout(self.layout)
 
 
 
-
-exit()
-
-
-
+class DataDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
 
 
+        self.setWindowTitle("Enter Data!")
 
-# define connection & cursor
-DB_FOLDER = '/home/admin/AlgoProject/scripts/AlphaVantage/db/' 
-DB_NAME = 'pnl.db'
-DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
-connection = sqlite3.connect(DB_NAME)
-cursor = connection.cursor()
+        QBtn = QDialogButtonBox.Ok #| QDialogButtonBox.Cancel
+        self.buttonBox = QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
 
-# Date,TotalValue,PieValue,Investment,PieInvestment,Realised,Dividend
+        self.layout = QVBoxLayout()
+        message = QLabel("This is where you will enter data about the account today")
+        box0 = QLabel("'entry_id' and 'Date' added automatically")
+        
+        #ENTRY_ID = "NULL"
+        #DATE = datetime.now().strftime("%d/%m/%Y") # "%Y%m%d-%H%M") # input("Enter the date (dd/mm/yyyy): ") 
 
-TABLE_NAME = "pldata"
-#TABLE_NAME = "pldataTEST3"
+        box1 = QLineEdit()
+        box1.setMaxLength(10)
+        box1.setPlaceholderText("Enter total account value: ")
+        box1.returnPressed.connect(self.return_pressed)
+        box1.selectionChanged.connect(self.selection_changed)
+        box1.textChanged.connect(self.text_changed)
+        box1.textEdited.connect(self.text_edited)
 
-def read_table(cmd):
-    cursor.execute(cmd)
-    results = cursor.fetchall()
-    print(results)
+        box2 = QLineEdit()
+        box2.setMaxLength(10)
+        box2.setPlaceholderText("Enter total invested amount: ")
+        box2.returnPressed.connect(self.return_pressed)
+        box2.selectionChanged.connect(self.selection_changed)
+        box2.textChanged.connect(self.text_changed)
+        box2.textEdited.connect(self.text_edited)
 
-# gather all data
-cmd = "SELECT * FROM {}".format(TABLE_NAME)
-#read_table(cmd)
+        box3 = QLineEdit()
+        box3.setMaxLength(10)
+        box3.setPlaceholderText("Enter total realised amount: ")
+        box3.returnPressed.connect(self.return_pressed)
+        box3.selectionChanged.connect(self.selection_changed)
+        box3.textChanged.connect(self.text_changed)
+        box3.textEdited.connect(self.text_edited)
 
-# gather data from specific dates
-col = "Date"
-var = "2021"
-cmd = "SELECT * FROM {} WHERE {} LIKE '%{}%'".format(TABLE_NAME,col,var)
-read_table(cmd)
+        box4 = QLineEdit()
+        box4.setMaxLength(10)
+        box4.setPlaceholderText("Enter total dividend amount: ")
+        box4.returnPressed.connect(self.return_pressed)
+        box4.selectionChanged.connect(self.selection_changed)
+        box4.textChanged.connect(self.text_changed)
+        box4.textEdited.connect(self.text_edited)
+
+        self.layout.addWidget(message)
+        self.layout.addWidget(box0)
+        self.layout.addWidget(box1)
+        self.layout.addWidget(box2)
+        self.layout.addWidget(box3)
+        self.layout.addWidget(box4)
+        self.layout.addWidget(self.buttonBox)
+        self.setLayout(self.layout)
+
+    def return_pressed(self):
+        print("Return pressed!")
+        #self.centralWidget().setText("BOOM!")
+
+    def selection_changed(self):
+        print("Selection changed")
+        print(self.centralWidget().selectedText())
+
+    def text_changed(self, s):
+        print("Text changed...")
+        print(s)
+
+    def text_edited(self, s):
+        print("Text edited...")
+        print(s)
+
+def enter_data():
+    print("Enter data...")
+    pycmd = 'python /home/admin/AlgoProject/scripts/32_EnterData_sqlite.py'
+    os.system(pycmd)
+
+def create_chart():
+    print("Generating chart")
+    pycmd = 'python /home/admin/AlgoProject/scripts/41_VisualiseData.py'
+    os.system(pycmd)
+
+class MainWindow(QMainWindow):
+
+    def __init__(self, *args, **kwargs):
+        super(MainWindow, self).__init__(*args, **kwargs)
+
+        self.setWindowTitle("Trading Account App")
+
+        mainlabel = QLabel("Account Data")
+        font = mainlabel.font()
+        font.setPointSize(20)
+        mainlabel.setFont(font)
+        mainlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+
+        enterdata = QPushButton("Enter Data")
+        enterdata.clicked.connect(enter_data)
+
+        createchart = QPushButton("Create Chart")
+        createchart.clicked.connect(create_chart)
+
+        exitbutton = QPushButton("Exit")
+        exitbutton.setObjectName("exitbutton")
+        exitbutton.clicked.connect(self.close)
+            
+        layout = QVBoxLayout() 
+
+        # Layout 2
+        layout2 = QHBoxLayout()
+
+        statslabel = QLabel("Stats:")
+        statsfont = statslabel.font()
+        statsfont.setPointSize(20)
+        statslabel.setFont(font)
+        statslabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+
+        allstats = QPushButton("All Stats")
+        allstats.clicked.connect(self.button_clicked_all)
+        ttstats = QPushButton("2020")
+        ttstats.clicked.connect(self.button_clicked_2020)
+        ttostats = QPushButton("2021")
+        ttostats.clicked.connect(self.button_clicked_2021)
+
+        layout2.addWidget(statslabel)
+        layout2.addWidget(allstats)
+        layout2.addWidget(ttstats)
+        layout2.addWidget(ttostats)
+
+        # Layout 3
+        # Trade suggestions
+        #buttonBox = QDialogButtonBox(QBtn)
+        #self.buttonBox.accepted.connect(self.accept)
+        #self.buttonBox.rejected.connect(self.reject)
+
+        layout3 = QHBoxLayout()
+        
+        #message = QLabel(SUGG)
+        tradelabel = QLabel("Trade:")
+        statsfont = tradelabel.font()
+        statsfont.setPointSize(20)
+        tradelabel.setFont(font)
+        tradelabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+
+        buy = QPushButton("Buy")
+        buy.clicked.connect(self.button_clicked_buy)
+
+        sell = QPushButton("Sell")
+        sell.clicked.connect(self.button_clicked_sell)
+
+        both = QPushButton("Both")
+        both.clicked.connect(self.button_clicked_both)
+
+        layout3.addWidget(tradelabel)
+        layout3.addWidget(buy)
+        layout3.addWidget(sell)
+        layout3.addWidget(both)
 
 
-# update a field
-#cursor.execute("UPDATE pldataTEST2 SET Dividend = 999 WHERE entry_id = 4")
+        layout.addWidget(mainlabel)
+        #layout.addWidget(showdata)
+        layout.addLayout(layout2)
+        #layout.addWidget(showsugg)
+        layout.addLayout(layout3)
+        layout.addWidget(enterdata)
+        layout.addWidget(createchart)
+        layout.addWidget(exitbutton)
 
-# delete a table
-# cursor.execute("DROP TABLE IF EXISTS pldataTEST3")
-# connection.commit()
+        widget = QWidget()
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
 
-# delete a row from a table
-#entry_id = 53
-#action = "DELETE FROM {} WHERE entry_id = {}".format(TABLE_NAME,entry_id)
-#print(action)
-#cursor.execute(action)
-#read_table()
-#connection.commit()
+    def button_clicked_buy(self, s):
+        global CHOICE
+        print("click", s)
+        CHOICE = "BUY"
+        dlg = ChoiceDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("buySuccess!")
+        else:
+            print("Cancel!")
 
+    def button_clicked_sell(self, s):
+        global CHOICE
+        print("click", s)
+        CHOICE = "SELL"
+        dlg = ChoiceDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("sellSuccess!")
+        else:
+            print("Cancel!")
 
+    def button_clicked_both(self, s):
+        global CHOICE
+        print("click", s)
+        CHOICE = "Both"
+        dlg = ChoiceDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("bothSuccess!")
+        else:
+            print("Cancel!")
+
+    def button_clicked(self, s):
+        print("click", s)
+
+        dlg = StatsDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("Success!")
+        else:
+            print("Cancel!")
+
+    def button_clicked_all(self, s):
+        global CHOICE
+        CHOICE = 0
+        print("click", s, CHOICE)
+        dlg = StatsDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("Success! {}".format(CHOICE))
+        else:
+            print("Cancel!")
+
+    def button_clicked_2020(self, s):
+        global CHOICE
+        CHOICE = 2020
+        print("click", s, CHOICE)
+        dlg = StatsDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("Success! {}".format(CHOICE))
+        else:
+            print("Cancel!")
+
+    def button_clicked_2021(self, s):
+        global CHOICE
+        CHOICE = 2021
+        print("click", s, CHOICE)
+        dlg = StatsDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("Success! {}".format(CHOICE))
+        else:
+            print("Cancel!")
+
+    def button_clicked_sugg(self, s):
+        print("click", s)
+
+        dlg = SuggDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("Success!")
+        else:
+            print("Cancel!")
+
+    def button_clicked_enterdata(self, s):
+        print("click", s)
+
+        dlg = DataDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("Data Entered Successfully!")
+        else:
+            print("Data Entry Cancelled!")
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+
+    window = MainWindow()
+
+    # setup stylesheet
+    #['dark_amber.xml', 'dark_blue.xml', 'dark_cyan.xml', 'dark_lightgreen.xml', 'dark_pink.xml', 'dark_purple.xml', 'dark_red.xml', 'dark_teal.xml', 'dark_yellow.xml', 
+    # 'light_amber.xml', 'light_blue.xml', 'light_cyan.xml', 'light_cyan_500.xml', 'light_lightgreen.xml', 'light_pink.xml', 'light_purple.xml', 'light_red.xml', 'light_teal.xml', 'light_yellow.xml']
+    apply_stylesheet(app, theme='light_blue.xml')
+    stylesheet = app.styleSheet()
+    # app.setStyleSheet(stylesheet + "QPushButton{color: red; text-transform: none;}")
+    with open('/home/admin/AlgoProject/scripts/custom.css') as file:
+        app.setStyleSheet(stylesheet + file.read().format(**os.environ))
+
+    window.show()
+    app.exec_()

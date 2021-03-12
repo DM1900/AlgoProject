@@ -22,13 +22,14 @@ class RuntimeStylesheets(QMainWindow):
 def Get_Stats(choice):
     global STATS
     STATSVALUE = ViewStats.Get_Stats(choice)
+    print(STATSVALUE)
     STATS = """{}""".format(STATSVALUE)
 
 class StatsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
 
-        Get_Stats(CHOICE)
+        Get_Stats(CHOICE) # returns a variable STATS
 
         self.setWindowTitle("STATS!")
 
@@ -45,10 +46,32 @@ class StatsDialog(QDialog):
         self.setLayout(self.layout)
 
 # suggestions:
+class pandasModel(QAbstractTableModel):
+    def __init__(self, data):
+        QAbstractTableModel.__init__(self)
+        self._data = data
+
+    def rowCount(self, parent=None):
+        return self._data.shape[0]
+
+    def columnCount(self, parnet=None):
+        return self._data.shape[1]
+
+    def data(self, index, role=Qt.DisplayRole):
+        if index.isValid():
+            if role == Qt.DisplayRole:
+                return str(self._data.iloc[index.row(), index.column()])
+        return None
+
+    def headerData(self, col, orientation, role):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return self._data.columns[col]
+        return None
+
 class ChoiceDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
-        self.setFixedSize(360, 620)
+        self.setFixedSize(420, 620)
 
         SUGG = SQLITE_func.GetSuggestions(CHOICE)
         df = pd.DataFrame(SUGG)
@@ -64,28 +87,6 @@ class ChoiceDialog(QDialog):
         
         message1 = QLabel(CHOICE)
 
-        class pandasModel(QAbstractTableModel):
-            def __init__(self, data):
-                QAbstractTableModel.__init__(self)
-                self._data = data
-
-            def rowCount(self, parent=None):
-                return self._data.shape[0]
-
-            def columnCount(self, parnet=None):
-                return self._data.shape[1]
-
-            def data(self, index, role=Qt.DisplayRole):
-                if index.isValid():
-                    if role == Qt.DisplayRole:
-                        return str(self._data.iloc[index.row(), index.column()])
-                return None
-
-            def headerData(self, col, orientation, role):
-                if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-                    return self._data.columns[col]
-                return None
-
         model = pandasModel(df)
         view = QTableView()
         view.setModel(model)
@@ -97,15 +98,16 @@ class ChoiceDialog(QDialog):
 
 
 
-class DataDialog(QDialog):
+class EnterDataDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
 
 
         self.setWindowTitle("Enter Data!")
 
-        QBtn = QDialogButtonBox.Ok #| QDialogButtonBox.Cancel
+        QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
         self.buttonBox = QDialogButtonBox(QBtn)
+        #self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
 
@@ -121,39 +123,48 @@ class DataDialog(QDialog):
         box1.setPlaceholderText("Enter total account value: ")
         box1.returnPressed.connect(self.return_pressed)
         box1.selectionChanged.connect(self.selection_changed)
-        box1.textChanged.connect(self.text_changed)
-        box1.textEdited.connect(self.text_edited)
+        #box1.textChanged.connect(self.text_changed)
+        #box1.textEdited.connect(self.text_edited)
+        box1.textEdited.connect(self.text_set_box1)
 
         box2 = QLineEdit()
         box2.setMaxLength(10)
         box2.setPlaceholderText("Enter total invested amount: ")
         box2.returnPressed.connect(self.return_pressed)
         box2.selectionChanged.connect(self.selection_changed)
-        box2.textChanged.connect(self.text_changed)
-        box2.textEdited.connect(self.text_edited)
+        #box2.textChanged.connect(self.text_changed)
+        #box2.textEdited.connect(self.text_edited)
+        box2.textEdited.connect(self.text_set_box2)
 
         box3 = QLineEdit()
         box3.setMaxLength(10)
         box3.setPlaceholderText("Enter total realised amount: ")
         box3.returnPressed.connect(self.return_pressed)
         box3.selectionChanged.connect(self.selection_changed)
-        box3.textChanged.connect(self.text_changed)
-        box3.textEdited.connect(self.text_edited)
+        #box3.textChanged.connect(self.text_changed)
+        #box3.textEdited.connect(self.text_edited)
+        box3.textEdited.connect(self.text_set_box3)
 
         box4 = QLineEdit()
         box4.setMaxLength(10)
         box4.setPlaceholderText("Enter total dividend amount: ")
         box4.returnPressed.connect(self.return_pressed)
         box4.selectionChanged.connect(self.selection_changed)
-        box4.textChanged.connect(self.text_changed)
-        box4.textEdited.connect(self.text_edited)
+        #box4.textChanged.connect(self.text_changed)
+        #box4.textEdited.connect(self.text_edited)
+        box4.textEdited.connect(self.text_set_box4)
+
+        process = QPushButton("Process data entry")
+        process.clicked.connect(self.process_data_entry)
+        process.clicked.connect(self.accept)
 
         self.layout.addWidget(message)
-        self.layout.addWidget(box0)
-        self.layout.addWidget(box1)
-        self.layout.addWidget(box2)
-        self.layout.addWidget(box3)
-        self.layout.addWidget(box4)
+        self.layout.addWidget(box0) 
+        self.layout.addWidget(box1) #BTOTAL
+        self.layout.addWidget(box2) #BINV
+        self.layout.addWidget(box3) #BREAL
+        self.layout.addWidget(box4) #BDIV
+        self.layout.addWidget(process)
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
 
@@ -172,6 +183,37 @@ class DataDialog(QDialog):
     def text_edited(self, s):
         print("Text edited...")
         print(s)
+
+    def text_set_box1(self, t):
+        global BTOTAL
+        #print("Text edited...")
+        BTOTAL = t
+        print(BTOTAL)
+
+    def text_set_box2(self, i):
+        global BINV
+        #print("Text edited...")
+        BINV = i
+        print(BINV)
+
+    def text_set_box3(self,r):
+        global BREAL
+        #print("Text edited...")
+        BREAL = r
+        print(BREAL)
+
+    def text_set_box4(self, d):
+        global BDIV
+        #print("Text edited...")
+        BDIV = d
+        print(BDIV)
+
+    def process_data_entry(a,b):
+        print(f"a: {a}")
+        print(f"b: {b}")
+        print("Values: {}, {}, {}, {}".format(BTOTAL,BINV,BREAL,BDIV))
+        
+
 
 def enter_data():
     print("Enter data...")
@@ -197,7 +239,7 @@ class MainWindow(QMainWindow):
         mainlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
 
         enterdata = QPushButton("Enter Data")
-        enterdata.clicked.connect(enter_data)
+        enterdata.clicked.connect(self.button_clicked_enterdata)
 
         createchart = QPushButton("Create Chart")
         createchart.clicked.connect(create_chart)
@@ -353,7 +395,7 @@ class MainWindow(QMainWindow):
     def button_clicked_enterdata(self, s):
         print("click", s)
 
-        dlg = DataDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        dlg = EnterDataDialog()  # If you pass self, the dialog will be centered over the main window as before.
         if dlg.exec_():
             print("Data Entered Successfully!")
         else:
