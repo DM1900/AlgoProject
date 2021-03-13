@@ -1,5 +1,6 @@
 import sqlite3
 from sqlite3.dbapi2 import Cursor
+from datetime import datetime, timedelta
 
 def CreateDB(DB_NAME,TABLE_NAME):
     connection = sqlite3.connect(DB_NAME)
@@ -42,6 +43,30 @@ def read_table(var):
     for x in results:
         print("{},{},{},{}".format(x[0],x[2],x[7],x[8]))
 
+def GetLastRow():
+    # define connection & cursor
+    DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
+    DB_NAME = 'pnl.db'
+    DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
+    connection = sqlite3.connect(DB_NAME)
+    cursor = connection.cursor()
+    # get last row for comparison data
+    TABLE_NAME = "pldata"
+    cmd = """SELECT * FROM {} ORDER BY entry_id DESC LIMIT 1""".format(TABLE_NAME)
+    LASTROW = cursor.execute(cmd).fetchone()
+    # variables:
+    LID = LASTROW[0]
+    LTABLEDATE = LASTROW[1]
+    LTotalValue = LASTROW[2]
+    LInvestment = LASTROW[4]
+    LRealised = LASTROW[6]
+    LDividend = LASTROW[7]
+    LInvValue = LASTROW[8]
+
+    LResults = [LID,LTABLEDATE,LTotalValue,LInvestment,LRealised,LDividend,LInvValue]
+    #print(LResults)
+    return LResults
+
 def GetSuggestions(VAR):
     # define connection & cursor
     DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
@@ -74,8 +99,36 @@ def GetSuggestions(VAR):
 
     GetLastTable()
     read_table(VAR)
-
     return results
+
+
+def EnterData(TotalValue,Investment,Realised,Dividend):
+    # define connection & cursor
+    DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
+    DB_NAME = 'pnl.db'
+    DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
+    connection = sqlite3.connect(DB_NAME)
+    cursor = connection.cursor()
+    # entry_id,Date,TotalValue,PieValue,Investment,PieInvestment,Realised,Dividend
+    TABLE_NAME = "pldata"
+    DATE = datetime.now().strftime("%d/%m/%Y") # "%Y%m%d-%H%M") # input("Enter the date (dd/mm/yyyy): ") 
+    DATE = """{}""".format()
+    INSERT_CMD = "INSERT INTO {} VALUES (NULL,{},{},{},{},{},{},{},{})".format(TABLE_NAME,DATE,TotalValue,0,Investment,0,Realised,Dividend,0)
+    print(INSERT_CMD)
+    cursor.execute(INSERT_CMD)
+    connection.commit()
+
+def DeleteRow(COL,VAL):
+    DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
+    DB_NAME = 'pnl.db'
+    DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
+    connection = sqlite3.connect(DB_NAME)
+    cursor = connection.cursor()
+    TABLE_NAME = "pldata"
+
+    cmd = "DELETE FROM {} WHERE {} = {}".format(TABLE_NAME,COL,VAL)
+    cursor.execute(cmd)
+    connection.commit()
 
 #VAR = input("Choose to view BUY or SELL (Leave blank for both): ") or "Both"# ask user to enter year
 #VAR = "Both"

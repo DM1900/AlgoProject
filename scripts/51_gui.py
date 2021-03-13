@@ -96,14 +96,21 @@ class ChoiceDialog(QDialog):
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
 
-
-
 class EnterDataDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
 
-
         self.setWindowTitle("Enter Data!")
+
+        LRESULTS = SQLITE_func.GetLastRow()
+        print(LRESULTS)
+        #LID = LRESULTS[0]
+        #LTABLEDATE = LRESULTS[1]
+        #LTOTAL = LRESULTS[2]
+        LINV = LRESULTS[3]
+        #LREAL = LRESULTS[4]
+        #LDIV = LRESULTS[5]
+        #LINVV = LRESULTS[6]
 
         QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
         self.buttonBox = QDialogButtonBox(QBtn)
@@ -112,15 +119,25 @@ class EnterDataDialog(QDialog):
         self.buttonBox.rejected.connect(self.reject)
 
         self.layout = QVBoxLayout()
-        message = QLabel("This is where you will enter data about the account today")
+        message = QLabel("Enter data about the account")
+        statsfont = message.font()
+        statsfont.setPointSize(20)
+        message.setFont(statsfont)
+        message.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+
+
         box0 = QLabel("'entry_id' and 'Date' added automatically")
+        box0font = box0.font()
+        box0font.setPointSize(12)
+        box0.setFont(box0font)
+        box0.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         
         #ENTRY_ID = "NULL"
         #DATE = datetime.now().strftime("%d/%m/%Y") # "%Y%m%d-%H%M") # input("Enter the date (dd/mm/yyyy): ") 
 
         box1 = QLineEdit()
         box1.setMaxLength(10)
-        box1.setPlaceholderText("Enter total account value: ")
+        box1.setPlaceholderText("Total account value: ")
         box1.returnPressed.connect(self.return_pressed)
         box1.selectionChanged.connect(self.selection_changed)
         #box1.textChanged.connect(self.text_changed)
@@ -129,7 +146,7 @@ class EnterDataDialog(QDialog):
 
         box2 = QLineEdit()
         box2.setMaxLength(10)
-        box2.setPlaceholderText("Enter total invested amount: ")
+        box2.setPlaceholderText(f"Total invested amount: (€{LINV})")
         box2.returnPressed.connect(self.return_pressed)
         box2.selectionChanged.connect(self.selection_changed)
         #box2.textChanged.connect(self.text_changed)
@@ -138,7 +155,7 @@ class EnterDataDialog(QDialog):
 
         box3 = QLineEdit()
         box3.setMaxLength(10)
-        box3.setPlaceholderText("Enter total realised amount: ")
+        box3.setPlaceholderText("Total realised amount: ")
         box3.returnPressed.connect(self.return_pressed)
         box3.selectionChanged.connect(self.selection_changed)
         #box3.textChanged.connect(self.text_changed)
@@ -147,7 +164,7 @@ class EnterDataDialog(QDialog):
 
         box4 = QLineEdit()
         box4.setMaxLength(10)
-        box4.setPlaceholderText("Enter total dividend amount: ")
+        box4.setPlaceholderText("Total dividend amount: ")
         box4.returnPressed.connect(self.return_pressed)
         box4.selectionChanged.connect(self.selection_changed)
         #box4.textChanged.connect(self.text_changed)
@@ -192,7 +209,6 @@ class EnterDataDialog(QDialog):
 
     def text_set_box2(self, i):
         global BINV
-        #print("Text edited...")
         BINV = i
         print(BINV)
 
@@ -211,7 +227,8 @@ class EnterDataDialog(QDialog):
     def process_data_entry(a,b):
         print(f"a: {a}")
         print(f"b: {b}")
-        print("Values: {}, {}, {}, {}".format(BTOTAL,BINV,BREAL,BDIV))
+        #print("Values: {}, {}, {}, {}".format(BTOTAL,BINV,BREAL,BDIV))
+        SQLITE_func.EnterData(BTOTAL,BINV,BREAL,BDIV)
         
 
 
@@ -255,8 +272,8 @@ class MainWindow(QMainWindow):
 
         statslabel = QLabel("Stats:")
         statsfont = statslabel.font()
-        statsfont.setPointSize(20)
-        statslabel.setFont(font)
+        statsfont.setPointSize(15)
+        statslabel.setFont(statsfont)
         statslabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
 
         allstats = QPushButton("All Stats")
@@ -282,8 +299,8 @@ class MainWindow(QMainWindow):
         #message = QLabel(SUGG)
         tradelabel = QLabel("Trade:")
         statsfont = tradelabel.font()
-        statsfont.setPointSize(20)
-        tradelabel.setFont(font)
+        statsfont.setPointSize(15)
+        tradelabel.setFont(statsfont)
         tradelabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
 
         buy = QPushButton("Buy")

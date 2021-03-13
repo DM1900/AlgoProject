@@ -56,11 +56,7 @@ cmd = "SELECT * FROM {} WHERE {} LIKE '%{}%'".format(TABLE_NAME,col,var)
 #exit()
 
 # Delete row from table
-COL = "entry_id"
-VAL = 7
-cmd = "DELETE FROM {} WHERE {} = {}".format(TABLE_NAME,COL,VAL)
-cursor.execute(cmd)
-connection.commit()
+
 
 
 #n = 1_
