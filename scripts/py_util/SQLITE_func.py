@@ -2,6 +2,8 @@ import sqlite3
 from sqlite3.dbapi2 import Cursor
 from datetime import datetime, timedelta
 
+DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
+
 def CreateDB(DB_NAME,TABLE_NAME):
     connection = sqlite3.connect(DB_NAME)
     cursor = connection.cursor()
@@ -45,7 +47,6 @@ def read_table(var):
 
 def GetLastRow():
     # define connection & cursor
-    DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
     DB_NAME = 'pnl.db'
     DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
     connection = sqlite3.connect(DB_NAME)
@@ -69,7 +70,6 @@ def GetLastRow():
 
 def GetSuggestions(VAR):
     # define connection & cursor
-    DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
     DB_NAME = 'StockData.db'
     DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
     connection = sqlite3.connect(DB_NAME)
@@ -104,22 +104,21 @@ def GetSuggestions(VAR):
 
 def EnterData(TotalValue,Investment,Realised,Dividend):
     # define connection & cursor
-    DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
     DB_NAME = 'pnl.db'
     DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
     connection = sqlite3.connect(DB_NAME)
     cursor = connection.cursor()
     # entry_id,Date,TotalValue,PieValue,Investment,PieInvestment,Realised,Dividend
     TABLE_NAME = "pldata"
+    VALUE = TotalValue
     DATE = datetime.now().strftime("%d/%m/%Y") # "%Y%m%d-%H%M") # input("Enter the date (dd/mm/yyyy): ") 
-    DATE = """{}""".format()
-    INSERT_CMD = "INSERT INTO {} VALUES (NULL,{},{},{},{},{},{},{},{})".format(TABLE_NAME,DATE,TotalValue,0,Investment,0,Realised,Dividend,0)
+    #DATE = """{}""".format(DATE)
+    INSERT_CMD = 'INSERT INTO {} VALUES (NULL,"{}",{},{},{},{},{},{},{})'.format(TABLE_NAME,DATE,TotalValue,0,Investment,0,Realised,Dividend,VALUE)
     print(INSERT_CMD)
     cursor.execute(INSERT_CMD)
     connection.commit()
 
 def DeleteRow(COL,VAL):
-    DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
     DB_NAME = 'pnl.db'
     DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
     connection = sqlite3.connect(DB_NAME)
@@ -130,13 +129,3 @@ def DeleteRow(COL,VAL):
     cursor.execute(cmd)
     connection.commit()
 
-#VAR = input("Choose to view BUY or SELL (Leave blank for both): ") or "Both"# ask user to enter year
-#VAR = "Both"
-#GetSuggestions(VAR)
-#print(results)
-
-#def ListResults():
-#    for x in results:
-#        print("{},{},{},{}".format(x[0],x[2],x[7],x[8]))
-#ListResults()
-#end

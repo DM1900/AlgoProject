@@ -28,7 +28,8 @@ LOGFILE = "/home/admin/AlgoProject/logs/"
 LOGFILE = LOGFILE + "Log_{}.log".format(LOGTIME)
 
 START = datetime.now()
-log.WriteToLog(LOGFILE,"Starting script at {}".format(START))
+SCRIPTNAME = "'02_get_data_sqlite.py'"
+log.WriteToLog(LOGFILE,"Starting {} script at {}".format(SCRIPTNAME,START))
 #
 # create sql table
 # define connection & cursor
@@ -53,17 +54,17 @@ DDATE = '"{}"'.format(DDATE)
 #
 RSI_PERIOD = 14 # no. of days to calculate RSI
 RSI_INT = 'daily' # interval to calculate RSI
-# RSI values
+# RSI values, these are used to determine buy/sell suggestions
 RSIVLOW = 20
-RSILOW = 45
-RSIHIGH = 65
+RSILOW = 40
+RSIHIGH = 70
 RSIVHIGH = 80
 log.WriteToLog(LOGFILE,"RSI settings: Period: {} days, Low: {}, High {}".format(RSI_PERIOD,RSILOW,RSIHIGH))
 # RSI Suggestions
 BUY = "BUY"
-BUYRSI = "BUY (RSI very low)"
+#BUYRSI = "BUY (RSI very low)"
 SELL = "SELL"
-SELLRSI = "SELL (RSI very high)"
+#SELLRSI = "SELL (RSI very high)"
 HOLD = "HOLD"
 # how long to wait between API calls (kind of irrelevant due to the way Alpha Vantage limits calls, but anyway...)
 WAITAPI = 6

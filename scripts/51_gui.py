@@ -85,7 +85,7 @@ class ChoiceDialog(QDialog):
 
         self.layout = QVBoxLayout()
         
-        message1 = QLabel(CHOICE)
+        message1 = QLabel("{}".format(CHOICE))
 
         model = pandasModel(df)
         view = QTableView()
@@ -229,8 +229,7 @@ class EnterDataDialog(QDialog):
         print(f"b: {b}")
         #print("Values: {}, {}, {}, {}".format(BTOTAL,BINV,BREAL,BDIV))
         SQLITE_func.EnterData(BTOTAL,BINV,BREAL,BDIV)
-        
-
+        print(SQLITE_func.GetLastRow())
 
 def enter_data():
     print("Enter data...")
@@ -241,6 +240,30 @@ def create_chart():
     print("Generating chart")
     pycmd = 'python /home/admin/AlgoProject/scripts/41_VisualiseData.py'
     os.system(pycmd)
+
+def get_stock_data():
+    print("Generating stock suggestion data")
+    pycmd = 'python /home/admin/AlgoProject/scripts/02_get_data_sqlite.py'
+    os.system(pycmd)
+
+class GetDataDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+
+        self.setWindowTitle("Gather Suggestion data?")
+
+        QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+
+        message = QLabel("Are you sure? mMay take up to 30 minutes to complete")
+
+        self.buttonBox = QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(get_stock_data)
+        self.buttonBox.rejected.connect(self.reject)
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(message)
+        self.layout.addWidget(self.buttonBox)
+        self.setLayout(self.layout)
 
 class MainWindow(QMainWindow):
 
@@ -312,6 +335,9 @@ class MainWindow(QMainWindow):
         both = QPushButton("Both")
         both.clicked.connect(self.button_clicked_both)
 
+        getdata = QPushButton("Gather Data")
+        getdata.clicked.connect(self.button_clicked_getdata)
+
         layout3.addWidget(tradelabel)
         layout3.addWidget(buy)
         layout3.addWidget(sell)
@@ -325,6 +351,7 @@ class MainWindow(QMainWindow):
         layout.addLayout(layout3)
         layout.addWidget(enterdata)
         layout.addWidget(createchart)
+        layout.addWidget(getdata)
         layout.addWidget(exitbutton)
 
         widget = QWidget()
@@ -417,6 +444,15 @@ class MainWindow(QMainWindow):
             print("Data Entered Successfully!")
         else:
             print("Data Entry Cancelled!")
+
+    def button_clicked_getdata(self, s):
+        print("click", s)
+
+        dlg = GetDataDialog()  # If you pass self, the dialog will be centered over the main window as before.
+        if dlg.exec_():
+            print("Success!")
+        else:
+            print("Cancel!")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
