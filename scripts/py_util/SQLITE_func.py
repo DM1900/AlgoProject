@@ -3,6 +3,8 @@ from sqlite3.dbapi2 import Cursor
 from datetime import datetime, timedelta
 
 DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
+DB_FOLDER = './AlgoProject/scripts/db/' 
+
 
 def CreateDB(DB_NAME,TABLE_NAME):
     connection = sqlite3.connect(DB_NAME)
@@ -101,7 +103,6 @@ def GetSuggestions(VAR):
     GetLastTable()
     read_table(VAR)
     return results
-print(GetSuggestions("Both"))
 
 def EnterData(TotalValue,Investment,Realised,Dividend):
     # define connection & cursor

@@ -24,7 +24,7 @@ from py_util import pylog as log
 
 # Log variables:
 LOGTIME = datetime.now().strftime("%Y%m%d-%H")
-LOGFILE = "/home/admin/AlgoProject/logs/"
+LOGFILE = "./logs/"
 LOGFILE = LOGFILE + "Log_{}.log".format(LOGTIME)
 
 START = datetime.now()
@@ -33,7 +33,7 @@ log.WriteToLog(LOGFILE,"Starting {} script at {}".format(SCRIPTNAME,START))
 #
 # create sql table
 # define connection & cursor
-DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
+DB_FOLDER = './scripts/db/' 
 #DB_NAME = 'pnl.db'
 DB_NAME = 'StockData.db'
 DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
@@ -71,7 +71,7 @@ WAITAPI = 6
 WAITERR = 6
 #
 # list of alpha vantage keys
-KEYS = "/home/admin/AlgoProject/scripts/keys/keys.txt" 
+KEYS = "./scripts/keys/keys.txt" 
 #
 # this is the mian one with all tickers
 log.WriteToLog(LOGFILE,"Set ticker list")
@@ -79,7 +79,7 @@ tickers = "tickerfile_TRADELIST.txt" # main list of all selected tickers
 #tickers = "tickerfile_TEST.txt"
 #tickers = "tickerfile_TEST_USA.txt"
 #
-tickerlist = "/home/admin/AlgoProject/tickers/AV/{}".format(tickers)
+tickerlist = "./tickers/AV/{}".format(tickers)
 #
 log.WriteToLog(LOGFILE,tickerlist)
 with open(tickerlist) as file:
