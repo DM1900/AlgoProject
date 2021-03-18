@@ -233,17 +233,17 @@ class EnterDataDialog(QDialog):
 
 def enter_data():
     print("Enter data...")
-    pycmd = 'python /home/admin/AlgoProject/scripts/32_EnterData_sqlite.py'
+    pycmd = 'python ./scripts/32_EnterData_sqlite.py'
     os.system(pycmd)
 
 def create_chart():
     print("Generating chart")
-    pycmd = 'python /home/admin/AlgoProject/scripts/41_VisualiseData.py'
+    pycmd = 'python ./scripts/41_VisualiseData.py'
     os.system(pycmd)
 
 def get_stock_data():
     print("Generating stock suggestion data")
-    pycmd = 'python /home/admin/AlgoProject/scripts/02_get_data_sqlite.py'
+    pycmd = 'python ./scripts/02_get_data_sqlite.py'
     os.system(pycmd)
 
 class GetDataDialog(QDialog):
@@ -465,7 +465,7 @@ if __name__ == "__main__":
     apply_stylesheet(app, theme='light_blue.xml')
     stylesheet = app.styleSheet()
     # app.setStyleSheet(stylesheet + "QPushButton{color: red; text-transform: none;}")
-    with open('/home/admin/AlgoProject/scripts/custom.css') as file:
+    with open('./scripts/custom.css') as file:
         app.setStyleSheet(stylesheet + file.read().format(**os.environ))
 
     window.show()

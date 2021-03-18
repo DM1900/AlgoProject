@@ -106,7 +106,7 @@ def dictToCSS(dictionnary):
  
 def create_chart():
     print("Generating chart")
-    pycmd = 'python /home/admin/AlgoProject/scripts/41_VisualiseData.py'
+    pycmd = 'python ./scripts/41_VisualiseData.py'
     os.system(pycmd)
 
 def show_portfolio():
@@ -118,14 +118,14 @@ def get_stock_data():
     check = input("Are you sure? could take 25 minutes! (y or n) ") or "n"
     if check == "y":
         print("Generating stock suggestion data")
-        pycmd = 'python /home/admin/AlgoProject/scripts/02_get_data_sqlite.py'
+        pycmd = 'python ./scripts/02_get_data_sqlite.py'
         os.system(pycmd)
     else:
         print("No action taken")
 
 def enter_data():
     print("Enter data...")
-    pycmd = 'python /home/admin/AlgoProject/scripts/32_EnterData_sqlite.py'
+    pycmd = 'python ./scripts/32_EnterData_sqlite.py'
     os.system(pycmd)
 
 #def acdata1(YEAR):

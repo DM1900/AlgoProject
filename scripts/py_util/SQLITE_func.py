@@ -3,7 +3,7 @@ from sqlite3.dbapi2 import Cursor
 from datetime import datetime, timedelta
 
 DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
-DB_FOLDER = './AlgoProject/scripts/db/' 
+DB_FOLDER = './scripts/db/' 
 
 
 def CreateDB(DB_NAME,TABLE_NAME):

@@ -5,7 +5,7 @@ import sqlite3
 from sqlite3.dbapi2 import Cursor
 
 # define connection & cursor
-DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
+DB_FOLDER = './scripts/db/' 
 DB_NAME = 'pnl.db'
 DB_NAME = 'StockData.db'
 

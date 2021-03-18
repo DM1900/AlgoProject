@@ -1,0 +1,15 @@
+# requirements file
+# "python -m pip install -r requirements.txt"
+
+pandas
+pandas_datareader
+alpha_vantage
+matplotlib
+numpy
+
+# for the gui:
+PyQt5
+
+# if using tkinter, uncomment this next bit:
+# tkinter
+# ttkthemes

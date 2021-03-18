@@ -34,7 +34,7 @@ greeting.mainloop()
 #print(themes)
 
 # define connection & cursor
-DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
+DB_FOLDER = './scripts/db/' 
 DB_NAME = 'pnl.db'
 DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
 connection = sqlite3.connect(DB_NAME)
