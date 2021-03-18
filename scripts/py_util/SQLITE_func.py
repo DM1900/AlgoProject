@@ -87,11 +87,12 @@ def GetSuggestions(VAR):
         return x
 
     def read_table(var):
+        SELECTIONS = "entry_id,Ticker,RSI,Suggestion"
         if var == "Both":
             var = "IN ('{}','{}')".format("BUY","SELL")
         else:
             var = "LIKE '%{}%'".format(var)
-        cmd = "SELECT entry_id,Ticker,Suggestion FROM {} WHERE {} {}".format(TABLE_NAME,COL,var)
+        cmd = "SELECT {} FROM {} WHERE {} {}".format(SELECTIONS,TABLE_NAME,COL,var)
         global results
         cursor.execute(cmd)
         results = cursor.fetchall()
@@ -100,7 +101,7 @@ def GetSuggestions(VAR):
     GetLastTable()
     read_table(VAR)
     return results
-
+print(GetSuggestions("Both"))
 
 def EnterData(TotalValue,Investment,Realised,Dividend):
     # define connection & cursor
