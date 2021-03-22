@@ -91,6 +91,7 @@ df2 = pd.DataFrame(columns=[])  # create empty dataframe
 
 def get_data(ticker):
     try:
+        print("Processing data for {}".format(ticker))
         # create empty dataframes
         TEMPdf = pd.DataFrame()
         df = pd.DataFrame()

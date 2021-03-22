@@ -22,7 +22,7 @@ class RuntimeStylesheets(QMainWindow):
 def Get_Stats(choice):
     global STATS
     STATSVALUE = ViewStats.Get_Stats(choice)
-    print(STATSVALUE)
+    #print(STATSVALUE)
     STATS = """{}""".format(STATSVALUE)
 
 class StatsDialog(QDialog):
@@ -254,7 +254,7 @@ class GetDataDialog(QDialog):
 
         QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
 
-        message = QLabel("Are you sure? mMay take up to 30 minutes to complete")
+        message = QLabel("Are you sure? May take up to 30 minutes to complete")
 
         self.buttonBox = QDialogButtonBox(QBtn)
         self.buttonBox.accepted.connect(get_stock_data)
