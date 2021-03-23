@@ -89,7 +89,7 @@ def GetSuggestions(VAR):
         return x
 
     def read_table(var):
-        SELECTIONS = "entry_id,Ticker,RSI,Suggestion"
+        SELECTIONS = "entry_id,Ticker,Price,Change,RSI,Suggestion"
         if var == "Both":
             var = "IN ('{}','{}')".format("BUY","SELL")
         else:

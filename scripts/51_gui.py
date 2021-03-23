@@ -71,7 +71,7 @@ class pandasModel(QAbstractTableModel):
 class ChoiceDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
-        self.setFixedSize(520, 620)
+        self.setFixedSize(650, 520)
 
         SUGG = SQLITE_func.GetSuggestions(CHOICE)
         df = pd.DataFrame(SUGG)

@@ -56,7 +56,7 @@ RSI_PERIOD = 14 # no. of days to calculate RSI
 RSI_INT = 'daily' # interval to calculate RSI
 # RSI values, these are used to determine buy/sell suggestions
 RSIVLOW = 20
-RSILOW = 40
+RSILOW = 35
 RSIHIGH = 70
 RSIVHIGH = 80
 log.WriteToLog(LOGFILE,"RSI settings: Period: {} days, Low: {}, High {}".format(RSI_PERIOD,RSILOW,RSIHIGH))
