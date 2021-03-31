@@ -1,4 +1,4 @@
-#!/usr/bin/python3.9
+#!/usr/bin/python3
 # DerekM - 2021
 # The data is gathered from Alpha Vantage which has a delay of 1 day on all stock data.
 # Please factor that into any tradng decisions (this is based on Daily RSI so it's not such a big issue here)
@@ -22,18 +22,47 @@ from py_util import AV_func
 from py_util import SQLITE_func
 from py_util import pylog as log
 
+# relative path, it's up to you which one to use:
+RPATH = "."
+RPATH = "/home/admin/AlgoProject"
+
 # Log variables:
 LOGTIME = datetime.now().strftime("%Y%m%d-%H")
-LOGFILE = "./logs/"
+LOGFILE = "{}/logs/".format(RPATH)
 LOGFILE = LOGFILE + "Log_{}.log".format(LOGTIME)
 
 START = datetime.now()
 SCRIPTNAME = "'02_get_data_sqlite.py'"
+
+def LogTest(logfile,msg):
+    msg = "{} {}".format(LOGTIME,msg)
+    f = open(logfile, "a")
+    f.write("""{}
+""".format(msg))
+    f.close()
+TESTTEXT = "{} Run confirmation from python script ('02_get_data_sqlite.py')".format(START)
+LogTest(LOGFILE,TESTTEXT)
+
+# relative path, it's up to you which one to use:
+RPATH = "."
+RPATH = "/home/admin/AlgoProject"
+
+# Log variables:
+LOGTIME = datetime.now().strftime("%Y%m%d-%H")
+LOGFILE = "{}/logs/".format(RPATH)
+LOGFILE = LOGFILE + "Log_{}.log".format(LOGTIME)
+
+START = datetime.now()
+SCRIPTNAME = "'02_get_data_sqlite.py'"
+
+#MESSAGE = "Log Test: {}, {}, {}".format(START,LOGFILE,SCRIPTNAME)
+#log.WriteToLog(LOGFILE,MESSAGE)
+
 log.WriteToLog(LOGFILE,"Starting {} script at {}".format(SCRIPTNAME,START))
 #
 # create sql table
 # define connection & cursor
-DB_FOLDER = './scripts/db/' 
+DB_FOLDER = '{}/scripts/db/'.format(RPATH)
 #DB_NAME = 'pnl.db'
 DB_NAME = 'StockData.db'
 DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
@@ -67,11 +96,11 @@ SELL = "SELL"
 #SELLRSI = "SELL (RSI very high)"
 HOLD = "HOLD"
 # how long to wait between API calls (kind of irrelevant due to the way Alpha Vantage limits calls, but anyway...)
-WAITAPI = 6
-WAITERR = 6
+WAITAPI = 7
+WAITERR = 5
 #
 # list of alpha vantage keys
-KEYS = "./scripts/keys/keys.txt" 
+KEYS = "{}/scripts/keys/keys.txt".format(RPATH)
 #
 # this is the mian one with all tickers
 log.WriteToLog(LOGFILE,"Set ticker list")
@@ -79,13 +108,14 @@ tickers = "tickerfile_TRADELIST.txt" # main list of all selected tickers
 #tickers = "tickerfile_TEST.txt"
 #tickers = "tickerfile_TEST_USA.txt"
 #
-tickerlist = "./tickers/AV/{}".format(tickers)
+tickerlist = "{}/tickers/AV/{}".format(RPATH,tickers)
 #
 log.WriteToLog(LOGFILE,tickerlist)
 with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
 
 #tickers = ['AAPL']
+
 
 df2 = pd.DataFrame(columns=[])  # create empty dataframe
 
