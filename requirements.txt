@@ -13,3 +13,6 @@ PyQt5
 # if using tkinter, uncomment this next bit:
 # tkinter
 # ttkthemes
+
+# Plotly Dash
+dash

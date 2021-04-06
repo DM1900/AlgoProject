@@ -108,8 +108,8 @@ class EnterDataDialog(QDialog):
         #LTABLEDATE = LRESULTS[1]
         #LTOTAL = LRESULTS[2]
         LINV = LRESULTS[3]
-        #LREAL = LRESULTS[4]
-        #LDIV = LRESULTS[5]
+        LREAL = LRESULTS[4]
+        LDIV = LRESULTS[5]
         #LINVV = LRESULTS[6]
 
         QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
@@ -155,7 +155,7 @@ class EnterDataDialog(QDialog):
 
         box3 = QLineEdit()
         box3.setMaxLength(10)
-        box3.setPlaceholderText("Total realised amount: ")
+        box3.setPlaceholderText(f"Total realised amount: (€{LREAL})")
         box3.returnPressed.connect(self.return_pressed)
         box3.selectionChanged.connect(self.selection_changed)
         #box3.textChanged.connect(self.text_changed)
@@ -164,7 +164,7 @@ class EnterDataDialog(QDialog):
 
         box4 = QLineEdit()
         box4.setMaxLength(10)
-        box4.setPlaceholderText("Total dividend amount: ")
+        box4.setPlaceholderText(f"Total dividend amount: (€{LDIV})")
         box4.returnPressed.connect(self.return_pressed)
         box4.selectionChanged.connect(self.selection_changed)
         #box4.textChanged.connect(self.text_changed)

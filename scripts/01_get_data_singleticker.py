@@ -15,7 +15,7 @@ RSI_INT = 'daily' # interval to calculate RSI
 
 tickers = ['AML.LON','AAPL']
 #tickers = ['DIS']
-#tickers = ['AMD']
+tickers = ['MARA']
 
 def get_data(ticker):
     APIkey = AV_func.GetAPIkey(KEYS) # get a new API key each time the script runs
