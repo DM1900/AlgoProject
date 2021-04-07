@@ -4,13 +4,13 @@
 import dash
 import dash_html_components as html
 import pandas as pd
-
-# imports:
 from datetime import datetime, timedelta
 from pandas_datareader import data
 import sqlite3
 from sqlite3.dbapi2 import Cursor
-
+# Custom functions
+from py_util import ViewStats
+from py_util import SQLITE_func
 
 # define connection & cursor
 DB_FOLDER = './scripts/db/' 
@@ -29,8 +29,38 @@ TABLE_NAME = TABLE_NAME[0]
 COL = "Suggestion"
 cmd = "SELECT * FROM {} WHERE {} IN ('BUY','SELL')".format(TABLE_NAME,COL)
 
-df = pd.read_sql(cmd, connection)
+df0 = pd.read_sql(cmd, connection)
 
+
+# stats:
+
+column_names = ["Date", "TotalValue","Investment","Realised","Dividend","InvValue","Percent"]
+#Date,TotalValue,PieValue,Investment,PieInvestment,Realised,Dividend,InvValue
+df1 = pd.DataFrame(columns = column_names)
+df2 = pd.DataFrame(columns = column_names)
+
+def Get_Stats_ALL():
+    global df1
+    STATSVALUE = ViewStats.Get_Stats(0)
+    STATSVALUE = STATSVALUE.split(",")
+    to_append = STATSVALUE
+    a_series = pd.Series(to_append, index = df1.columns)
+    df1 = df1.append(a_series, ignore_index=True)
+
+Get_Stats_ALL()
+
+def Get_Stats(choice):
+    global df2
+    STATSVALUE = ViewStats.Get_Stats(choice)
+    STATSVALUE = STATSVALUE.split(",")
+    to_append = STATSVALUE
+    a_series = pd.Series(to_append, index = df2.columns)
+    df2 = df2.append(a_series, ignore_index=True)
+
+Get_Stats(2021)
+Get_Stats(2020)
+
+#print(df2)
 
 def generate_table(dataframe, max_rows=10):
     return html.Table([
@@ -45,12 +75,18 @@ def generate_table(dataframe, max_rows=10):
     ])
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+#external_stylesheets = ['https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div(children=[
     html.H4(children='Buy/Sell list'),
-    generate_table(df)
+    generate_table(df0),
+    html.H6(children='---'),
+    html.H4(children='Yearly Account Data'),
+    generate_table(df2),
+    html.H4(children='Account Data (Cumulative)'),
+    generate_table(df1)
 ])
 
 if __name__ == '__main__':
