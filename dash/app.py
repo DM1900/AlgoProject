@@ -30,6 +30,7 @@ cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
 TABLELIST = cursor.fetchall()
 TABLE_NAME = TABLELIST[-1]
 TABLE_NAME = TABLE_NAME[0]
+BUYSELLLIST = TABLE_NAME
 
 #df = pd.read_csv('https://gist.githubusercontent.com/chriddyp/c78bf172206ce24f77d6363a2d754b59/raw/c353e8ef842413cae56ae3920b8fd78468aa4cb2/usa-agricultural-exports-2011.csv')
 COL = "Suggestion"
@@ -85,7 +86,7 @@ def generate_table(dataframe, max_rows=10):
 DB_FOLDER = './scripts/db/' 
 DB_NAME = 'pnl.db'
 DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
-print(DB_NAME)
+#print(DB_NAME)
 TABLE_NAME = "pldata"
 connection = sqlite3.connect(DB_NAME)
 cursor = connection.cursor()
@@ -105,20 +106,18 @@ cmd = "SELECT * FROM {}".format(TABLE_NAME)
 #read_table(cmd)
 
 # gather data from specific dates (or any specified column)
-col = "Date"
-var = "2021"
-cmd = "SELECT * FROM {} WHERE {} LIKE '%{}%'".format(TABLE_NAME,col,var)
+#col = "Date"
+#var = "2020"
+#cmd = "SELECT * FROM {} WHERE {} LIKE '%{}%'".format(TABLE_NAME,col,var)
 
-df2 = pd.read_sql(cmd, connection)
+#df2 = pd.read_sql(cmd, connection)
 
 #print(df2)
 #exit()
 ###
 
-
-
 #df2 = px.data.gapminder().query("continent=='Oceania'")
-fig = px.line(df2, x="Date", y="TotalValue")
+#fig = px.line(df2, x="Date", y="TotalValue")
 
 
 ###
@@ -130,7 +129,8 @@ fig = px.line(df2, x="Date", y="TotalValue")
 app = dash.Dash(__name__)#,external_stylesheets=external_stylesheets)
 
 app.layout = html.Div(children=[
-    html.H4(children='Buy/Sell list'),
+    html.H4(children='Buy/Sell list'), 
+    html.H6(children=BUYSELLLIST),
     generate_table(df0),
     html.Hr(),
     html.H4(children='Yearly Account Data'),
@@ -147,8 +147,11 @@ app.layout = html.Div(children=[
     html.Div(id="number-out"),
     # button
     html.Button('Button 1', id='btn1', n_clicks=0),
+    html.H1("test"),
     html.Div(id='container-button-timestamp'),
-    dcc.Graph(figure=fig),
+    #dcc.Graph(figure=fig),
+
+    html.H6("DM 250421")
 ])
 
 @app.callback(
@@ -165,8 +168,6 @@ def update_output(event,Total, Inv, Real, Div):
     SUM = event #Total + Inv + Real + Div + event
     return 'This is a test of the button {}, {}, {}, {}, {}, {}'.format(SUM,event,Total, Inv, Real, Div)
     #SQLITE_func.EnterData(Total,Inv,Real,Div)
-
-
 
 
 
