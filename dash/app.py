@@ -6,6 +6,7 @@ import dash
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_table
 import plotly.express as px
 # others
 from dash.dependencies import Input, Output
@@ -14,12 +15,17 @@ from datetime import datetime, timedelta
 from pandas_datareader import data
 import sqlite3
 from sqlite3.dbapi2 import Cursor
+from dash.dependencies import Input, Output
+#import dash_bootstrap_components as dbc
 # Custom functions
 from py_util import ViewStats
 from py_util import SQLITE_func
+from vars import *
 
 # define connection & cursor
-DB_FOLDER = './scripts/db/' 
+RPATH = "/home/derek/AlgoProject"
+DB_FOLDER = "{}/scripts/db/".format(RPATH)
+
 #DB_NAME = 'pnl.db'
 DB_NAME = 'StockData.db'
 DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
@@ -31,13 +37,42 @@ TABLELIST = cursor.fetchall()
 TABLE_NAME = TABLELIST[-1]
 TABLE_NAME = TABLE_NAME[0]
 BUYSELLLIST = TABLE_NAME
+"""
+TABLES = TABLELIST[0]
+TABLESS = "{},{}".format(TABLELIST[0],TABLES[1])
+print(TABLES)
+exit()
+def STOCKGRAPH(var):
+    global fig2
+    col = "Ticker"
+    cmd = "SELECT * FROM {} WHERE {} LIKE '%{}%'".format(TABLESS,col,var)
+    dfs = pd.read_sql(cmd, connection)
+    fig2 = px.line(dfs, x="Date", y="Price")
+    return fig2
+
+STOCKGRAPH("AAPL")
+"""
 
 #df = pd.read_csv('https://gist.githubusercontent.com/chriddyp/c78bf172206ce24f77d6363a2d754b59/raw/c353e8ef842413cae56ae3920b8fd78468aa4cb2/usa-agricultural-exports-2011.csv')
 COL = "Suggestion"
 cmd = "SELECT * FROM {} WHERE {} IN ('BUY','SELL')".format(TABLE_NAME,COL)
-
 df0 = pd.read_sql(cmd, connection)
 
+cmd = "SELECT * FROM {} ".format(TABLE_NAME)
+df3 = pd.read_sql(cmd, connection)
+
+# list of tickers
+TICKERSLIST = "{}/tickers/AV/tickerfile_TRADELIST.txt".format(RPATH)
+df4 = pd.read_csv(TICKERSLIST, delimiter = "\t")
+
+# get last row:
+LRESULTS = SQLITE_func.GetLastRow()
+#LID = LRESULTS[0]
+#LTABLEDATE = LRESULTS[1]
+#LTOTAL = LRESULTS[2]
+LINV = LRESULTS[3]
+LREAL = LRESULTS[4]
+LDIV = LRESULTS[5]
 
 # stats:
 
@@ -67,20 +102,6 @@ def Get_Stats(choice):
 Get_Stats(2021)
 Get_Stats(2020)
 
-#print(df2)
-
-def generate_table(dataframe, max_rows=10):
-    return html.Table([
-        html.Thead(
-            html.Tr([html.Th(col) for col in dataframe.columns])
-        ),
-        html.Tbody([
-            html.Tr([
-                html.Td(dataframe.iloc[i][col]) for col in dataframe.columns
-            ]) for i in range(min(len(dataframe), max_rows))
-        ])
-    ])
-
 ### Charts
 # Create your connection.
 DB_FOLDER = './scripts/db/' 
@@ -105,53 +126,204 @@ def read_table(cmd):
 cmd = "SELECT * FROM {}".format(TABLE_NAME)
 #read_table(cmd)
 
+def EnterData(TotalValue,Investment,Realised,Dividend):
+    # define connection & cursor
+    DB_NAME = 'pnl.db'
+    DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value data
+    connection = sqlite3.connect(DB_NAME)
+    cursor = connection.cursor()
+    # entry_id,Date,TotalValue,PieValue,Investment,PieInvestment,Realised,Dividend
+    TABLE_NAME = "pldata"
+    VALUE = TotalValue
+    DATE = datetime.now().strftime("%d/%m/%Y") # "%Y%m%d-%H%M") # input("Enter the date (dd/mm/yyyy): ") 
+    #DATE = """{}""".format(DATE)
+    INSERT_CMD = 'INSERT INTO {} VALUES (NULL,"{}",{},{},{},{},{},{},{})'.format(TABLE_NAME,DATE,TotalValue,0,Investment,0,Realised,Dividend,VALUE)
+    print(INSERT_CMD)
+    cursor.execute(INSERT_CMD)
+    connection.commit()
+
 # gather data from specific dates (or any specified column)
-#col = "Date"
-#var = "2020"
-#cmd = "SELECT * FROM {} WHERE {} LIKE '%{}%'".format(TABLE_NAME,col,var)
+def GRAPHTOTAL(var):
+    global fig
+    col = "Date"
+    cmd = "SELECT * FROM {} WHERE {} LIKE '%{}%'".format(TABLE_NAME,col,var)
+    df3 = pd.read_sql(cmd, connection)
+    fig = px.line(df3, x="Date", y="TotalValue")
+    return fig
 
-#df2 = pd.read_sql(cmd, connection)
+GRAPHTOTAL(2021)
 
-#print(df2)
-#exit()
+
+
+
 ###
 
-#df2 = px.data.gapminder().query("continent=='Oceania'")
-#fig = px.line(df2, x="Date", y="TotalValue")
+external_stylesheets = 'https://codepen.io/chriddyp/pen/bWLwgP.css'
+#external_stylesheets = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css'
+#external_stylesheets = 'https://codepen.io/chriddyp/pen/dZVMbK.css'
+#external_stylesheets = 'https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/darkly/bootstrap.min.css'
+#external_stylesheets = 'https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/cosmo/bootstrap.min.css'
 
+app = dash.Dash(__name__)#,external_stylesheets=[external_stylesheets])
 
-###
-
-#external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-#external_stylesheets = ['https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css']
-#external_stylesheets = ['https://codepen.io/chriddyp/pen/dZVMbK.css']
-
-app = dash.Dash(__name__)#,external_stylesheets=external_stylesheets)
+TIME = datetime.now()
+FOOTER = "{}".format(TIME)
 
 app.layout = html.Div(children=[
     html.H4(children='Buy/Sell list'), 
-    html.H6(children=BUYSELLLIST),
-    generate_table(df0),
-    html.Hr(),
+    html.H6(children="{} | RSI Low: {}, RSI High {}".format(BUYSELLLIST,RSILOW,RSIHIGH)),
+    dash_table.DataTable(
+    id='BuySell',
+    columns=[{"name": i, "id": i} for i in df0.columns],
+    data=df0.to_dict('records'),
+    style_table={
+        'overflowX': 'auto',
+        'width': '50%',
+        },
+    style_as_list_view=True,
+    style_header={'backgroundColor': '#1F2739'},
+    style_cell={
+        'backgroundColor': '#323C50',
+        'color': 'white'
+        },
+    style_data_conditional=[
+        {
+            'if': {
+                'filter_query': '{{Suggestion}} = {}'.format("BUY"),
+                'column_id': 'Suggestion'
+            },
+            'color': 'green',
+            'fontWeight': 'bold'
+        },
+                {
+            'if': {
+                'filter_query': '{{Suggestion}} = {}'.format("SELL"),
+                'column_id': 'Suggestion'
+            },
+            'color': 'red',
+            'fontWeight': 'bold'
+        },
+                {
+            'if': {
+                'filter_query': '{RSI} > 70',
+                'column_id': 'RSI'
+            },
+            'color': 'tomato',
+            'fontWeight': 'bold'
+        },
+        {
+            'if': {
+                'filter_query': '{RSI} < 35',
+                'column_id': 'RSI'
+            },
+            'color': 'green',
+            'fontWeight': 'bold'
+        },
+    ]
+    ),
+    #
+    html.H4(children="All Tickers"),
+    dash_table.DataTable(
+    id='AllTickers',
+    columns=[{"name": i, "id": i} for i in df3.columns],
+    data=df3.to_dict('records'),
+    page_action='none',
+    style_table={
+        'height': '150px', 
+        'overflowY': 'auto',
+        'overflowX': 'auto',
+        'width': '50%',
+        },
+    style_as_list_view=True,
+    style_header={'backgroundColor': '#1F2739'},
+    style_cell={
+        'backgroundColor': '#323C50',
+        'color': 'white'
+        },
+    style_data_conditional=[
+        {
+            'if': {
+                'filter_query': '{{Suggestion}} = {}'.format("BUY"),
+                'column_id': 'Suggestion'
+            },
+            'color': 'green',
+            'fontWeight': 'bold'
+        },
+                {
+            'if': {
+                'filter_query': '{{Suggestion}} = {}'.format("SELL"),
+                'column_id': 'Suggestion'
+            },
+            'color': 'red',
+            'fontWeight': 'bold'
+        },
+        {
+            'if': {
+                'filter_query': '{RSI} > 70',
+                'column_id': 'RSI'
+            },
+            'color': 'tomato',
+            'fontWeight': 'bold'
+        },
+        {
+            'if': {
+                'filter_query': '{RSI} < 35',
+                'column_id': 'RSI'
+            },
+            'color': 'green',
+            'fontWeight': 'bold'
+        },
+    ]
+    ),
+    #html.Hr(), 
     html.H4(children='Yearly Account Data'),
-    generate_table(df2),
+    #generate_table(df2),
+    dash_table.DataTable(
+    id='AccData',
+    columns=[{"name": i, "id": i} for i in df2.columns],
+    data=df2.to_dict('records'),
+    style_table={
+        'overflowX': 'auto',
+        'width': '50%',
+    },
+    style_as_list_view=True,
+    style_header={'backgroundColor': '#1F2739'},
+    style_cell={
+        'backgroundColor': '#323C50',
+        'color': 'white'
+    },
+    ),
     html.H4(children='Account Data (Cumulative)'),
-    generate_table(df1),
-    html.Hr(),
+    #generate_table(df1),
+    dash_table.DataTable(
+    id='AccData_AllTime',
+    columns=[{"name": i, "id": i} for i in df1.columns],
+    data=df1.to_dict('records'),
+    style_table={
+        'overflowX': 'auto',
+        'width': '50%',
+    },
+    style_as_list_view=True,
+    style_header={'backgroundColor': '#1F2739'},
+    style_cell={
+        'backgroundColor': '#323C50',
+        'color': 'white'
+    },
+    ),
+    #html.Hr(),
     html.H4(children='Enter Data'),
-    # input
+    # input button
     dcc.Input(id="Total", type="number", placeholder="Total account value"),
-    dcc.Input(id="Inv", type="number", placeholder="Total invested amount"),
-    dcc.Input(id="Real", type="number", placeholder="Total realised amount"),
-    dcc.Input(id="Div", type="number", placeholder="Total dividend amount"),
+    dcc.Input(id="Inv", type="number", placeholder="Total invested (€{})".format(LINV)),
+    dcc.Input(id="Real", type="number", placeholder="Total realised"),
+    dcc.Input(id="Div", type="number", placeholder="Total dividend"),
     html.Div(id="number-out"),
-    # button
     html.Button('Button 1', id='btn1', n_clicks=0),
-    html.H1("test"),
     html.Div(id='container-button-timestamp'),
-    #dcc.Graph(figure=fig),
-
-    html.H6("DM 250421")
+    # line graph
+    dcc.Graph(figure=fig),
+    #dcc.Graph(figure=fig2),
+    html.H6("Page load time: {}".format(FOOTER)),
 ])
 
 @app.callback(
@@ -165,11 +337,13 @@ app.layout = html.Div(children=[
 
 )
 def update_output(event,Total, Inv, Real, Div):
-    SUM = event #Total + Inv + Real + Div + event
-    return 'This is a test of the button {}, {}, {}, {}, {}, {}'.format(SUM,event,Total, Inv, Real, Div)
-    #SQLITE_func.EnterData(Total,Inv,Real,Div)
-
-
+    if event == 0:
+        return "Not Clicked ({})".format(event)
+    else:
+        x = '{}, {}, {}, {}'.format(Total, Inv, Real, Div)
+        SQLITE_func.EnterData(Total,Inv,Real,Div)
+        return "Clicked {} times. {}".format(event, x)
+    
 
 if __name__ == '__main__':
     app.run_server(debug=True)

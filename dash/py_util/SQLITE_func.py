@@ -2,8 +2,8 @@ import sqlite3
 from sqlite3.dbapi2 import Cursor
 from datetime import datetime, timedelta
 
-DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
-DB_FOLDER = './scripts/db/' 
+DB_FOLDER = '/home/derek/AlgoProject/scripts/db/' 
+#DB_FOLDER = './scripts/db/' 
 
 
 def CreateDB(DB_NAME,TABLE_NAME):
@@ -119,6 +119,8 @@ def EnterData(TotalValue,Investment,Realised,Dividend):
     print(INSERT_CMD)
     cursor.execute(INSERT_CMD)
     connection.commit()
+
+#EnterData(2190.76,1800,521.69,9.49)    
 
 def DeleteRow(COL,VAL):
     DB_NAME = 'pnl.db'

@@ -2,7 +2,7 @@ import sqlite3
 from sqlite3.dbapi2 import Cursor
 from datetime import datetime, timedelta
 
-DB_FOLDER = '/home/admin/AlgoProject/scripts/db/' 
+DB_FOLDER = '/home/derek/AlgoProject/scripts/db/' 
 DB_FOLDER = './scripts/db/' 
 
 

@@ -21,8 +21,8 @@ DB_NAME = '{}{}'.format(DB_FOLDER,DB_NAME) # this DB stores all account value da
 connection = sqlite3.connect(DB_NAME)
 cursor = connection.cursor()
 # create table:
-TABLE_DATE = "20210306_"
-TABLE_NAME = "StockData_{}".format(TABLE_DATE)
+#TABLE_DATE = "20210306_"
+#TABLE_NAME = "StockData_{}".format(TABLE_DATE)
 COL = "Suggestion"
 
 def GetLastTable():
@@ -32,6 +32,7 @@ def GetLastTable():
     TABLE = cursor.fetchall()
     x = TABLE[0]
     TABLE_NAME = x[0]
+    print(x)
     return x
 
 def read_table(var):
@@ -44,7 +45,8 @@ def read_table(var):
     cursor.execute(cmd)
     results = cursor.fetchall()
     for x in results:
-        print("{},{},{},{}".format(x[0],x[2],x[7],x[8]))
+        #print("{},{},{},{}".format(x[0],x[2],x[7],x[8]))
+        print("{},{},{},{},{},{},{},{},{}".format(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8]))
 
 def main(VAR):
     GetLastTable()

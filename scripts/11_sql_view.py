@@ -27,7 +27,7 @@ cursor = connection.cursor()
 # create table:
 TABLE_DATE = datetime.now().strftime("%Y%m%d_%H")
 TABLE_NAME = "StockData_{}".format(TABLE_DATE)
-TABLE_NAME = "StockData_20210304_22"
+TABLE_NAME = "StockData_20210427_02"
 #TABLE_NAME = "StockData_20210215_test4"
 
 #

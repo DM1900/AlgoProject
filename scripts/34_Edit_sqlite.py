@@ -17,7 +17,7 @@ cursor = connection.cursor()
 # create table:
 # Date,TotalValue,PieValue,Investment,PieInvestment,Realised,Dividend,InvValue
 
-TABLE_NAME = "pldata"
+#TABLE_NAME = "pldata"
 
 command1 = """CREATE TABLE IF NOT EXISTS pldata (
     entry_id INTEGER PRIMARY KEY,
@@ -35,7 +35,7 @@ command1 = """CREATE TABLE IF NOT EXISTS pldata (
 # table name
 
 
-TABLE_NAME = "StockData_20210306_08"
+TABLE_NAME = "StockData_20210430_15"
 
 # read table
 def read_table(cmd):
@@ -93,5 +93,6 @@ cmd = "SELECT * FROM {} WHERE {} LIKE '%{}%'".format(TABLE_NAME,col,var)
 #cursor.execute("UPDATE pldataTEST2 SET Dividend = 999 WHERE entry_id = 4")
 
 # delete a table
-# cursor.execute("DROP TABLE IF EXISTS pldataTEST3")
-# connection.commit()
+#TABLE_NAME = "StockData_20210430_15"
+#cursor.execute("DROP TABLE IF EXISTS {}".format(TABLE_NAME))
+#connection.commit()

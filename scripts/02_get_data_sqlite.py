@@ -21,10 +21,11 @@ from sqlite3.dbapi2 import Cursor
 from py_util import AV_func
 from py_util import SQLITE_func
 from py_util import pylog as log
+from vars import *
 
 # relative path, it's up to you which one to use:
 RPATH = "."
-RPATH = "/home/admin/AlgoProject"
+RPATH = "/home/derek/AlgoProject"
 
 # Log variables:
 LOGTIME = datetime.now().strftime("%Y%m%d-%H")
@@ -45,7 +46,7 @@ LogTest(LOGFILE,TESTTEXT)
 
 # relative path, it's up to you which one to use:
 RPATH = "."
-RPATH = "/home/admin/AlgoProject"
+RPATH = "/home/derek/AlgoProject"
 
 # Log variables:
 LOGTIME = datetime.now().strftime("%Y%m%d-%H")
@@ -84,10 +85,10 @@ DDATE = '"{}"'.format(DDATE)
 RSI_PERIOD = 14 # no. of days to calculate RSI
 RSI_INT = 'daily' # interval to calculate RSI
 # RSI values, these are used to determine buy/sell suggestions
-RSIVLOW = 20
-RSILOW = 35
-RSIHIGH = 70
-RSIVHIGH = 80
+#RSIVLOW = 20
+#RSILOW = 35
+#RSIHIGH = 70
+#RSIVHIGH = 80
 log.WriteToLog(LOGFILE,"RSI settings: Period: {} days, Low: {}, High {}".format(RSI_PERIOD,RSILOW,RSIHIGH))
 # RSI Suggestions
 BUY = "BUY"
@@ -115,7 +116,6 @@ with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
 
 #tickers = ['AAPL']
-
 
 df2 = pd.DataFrame(columns=[])  # create empty dataframe
 
