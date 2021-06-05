@@ -32,8 +32,10 @@ def GetLastTable():
     TABLE = cursor.fetchall()
     x = TABLE[0]
     TABLE_NAME = x[0]
+    #TABLE_NAME = "StockData_20210501_02"
     print(x)
     return x
+
 
 def read_table(var):
     if var == "Both":

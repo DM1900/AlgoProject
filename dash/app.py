@@ -16,7 +16,7 @@ from pandas_datareader import data
 import sqlite3
 from sqlite3.dbapi2 import Cursor
 from dash.dependencies import Input, Output
-#import dash_bootstrap_components as dbc
+#import dash_bootstrap_components as dbc+
 # Custom functions
 from py_util import ViewStats
 from py_util import SQLITE_func
@@ -53,13 +53,16 @@ def STOCKGRAPH(var):
 STOCKGRAPH("AAPL")
 """
 
-#df = pd.read_csv('https://gist.githubusercontent.com/chriddyp/c78bf172206ce24f77d6363a2d754b59/raw/c353e8ef842413cae56ae3920b8fd78468aa4cb2/usa-agricultural-exports-2011.csv')
 COL = "Suggestion"
 cmd = "SELECT * FROM {} WHERE {} IN ('BUY','SELL')".format(TABLE_NAME,COL)
 df0 = pd.read_sql(cmd, connection)
+df0 = df0.drop('Action', axis=1)
+df0 = df0.sort_values('RSI')
 
 cmd = "SELECT * FROM {} ".format(TABLE_NAME)
 df3 = pd.read_sql(cmd, connection)
+df3 = df3.drop('Action', axis=1)
+df3 = df3.sort_values('RSI')
 
 # list of tickers
 TICKERSLIST = "{}/tickers/AV/tickerfile_TRADELIST.txt".format(RPATH)
@@ -79,6 +82,7 @@ LDIV = LRESULTS[5]
 column_names = ["Date", "TotalValue","Investment","Realised","Dividend","InvValue","Percent"]
 #Date,TotalValue,PieValue,Investment,PieInvestment,Realised,Dividend,InvValue
 df1 = pd.DataFrame(columns = column_names)
+
 df2 = pd.DataFrame(columns = column_names)
 
 def Get_Stats_ALL():
@@ -88,6 +92,7 @@ def Get_Stats_ALL():
     to_append = STATSVALUE
     a_series = pd.Series(to_append, index = df1.columns)
     df1 = df1.append(a_series, ignore_index=True)
+    df1 = df1.drop('InvValue', axis=1)
 
 Get_Stats_ALL()
 
@@ -101,6 +106,8 @@ def Get_Stats(choice):
 
 Get_Stats(2021)
 Get_Stats(2020)
+
+df2 = df2.drop('InvValue', axis=1)
 
 ### Charts
 # Create your connection.
@@ -154,8 +161,6 @@ def GRAPHTOTAL(var):
 GRAPHTOTAL(2021)
 
 
-
-
 ###
 
 external_stylesheets = 'https://codepen.io/chriddyp/pen/bWLwgP.css'
@@ -178,7 +183,7 @@ app.layout = html.Div(children=[
     data=df0.to_dict('records'),
     style_table={
         'overflowX': 'auto',
-        'width': '50%',
+        'width': '50%'
         },
     style_as_list_view=True,
     style_header={'backgroundColor': '#1F2739'},
@@ -192,33 +197,44 @@ app.layout = html.Div(children=[
                 'filter_query': '{{Suggestion}} = {}'.format("BUY"),
                 'column_id': 'Suggestion'
             },
-            'color': 'green',
-            'fontWeight': 'bold'
+            'color': 'green'
         },
                 {
             'if': {
                 'filter_query': '{{Suggestion}} = {}'.format("SELL"),
                 'column_id': 'Suggestion'
             },
-            'color': 'red',
-            'fontWeight': 'bold'
+            'color': 'red'
         },
-                {
+        {
             'if': {
                 'filter_query': '{RSI} > 70',
                 'column_id': 'RSI'
             },
-            'color': 'tomato',
-            'fontWeight': 'bold'
+            'color': 'red',
         },
+        {
+            'if': {
+                'filter_query': '{RSI} > 70',
+                'column_id': 'Ticker'
+            },
+            'color': 'red'
+        },  
         {
             'if': {
                 'filter_query': '{RSI} < 35',
                 'column_id': 'RSI'
             },
             'color': 'green',
-            'fontWeight': 'bold'
         },
+        {
+            'if': {
+                'filter_query': '{RSI} < 35',
+                'column_id': 'Ticker'
+            },
+            'color': 'green'
+        }, 
+
     ]
     ),
     #
@@ -254,24 +270,21 @@ app.layout = html.Div(children=[
                 'filter_query': '{{Suggestion}} = {}'.format("SELL"),
                 'column_id': 'Suggestion'
             },
-            'color': 'red',
-            'fontWeight': 'bold'
+            'color': 'red'
         },
         {
             'if': {
                 'filter_query': '{RSI} > 70',
                 'column_id': 'RSI'
             },
-            'color': 'tomato',
-            'fontWeight': 'bold'
-        },
+            'color': 'red'
+        },       
         {
             'if': {
-                'filter_query': '{RSI} < 35',
+                'filter_query': '{RSI} < 40',
                 'column_id': 'RSI'
             },
-            'color': 'green',
-            'fontWeight': 'bold'
+            'color': 'green'
         },
     ]
     ),
@@ -321,7 +334,7 @@ app.layout = html.Div(children=[
     html.Button('Button 1', id='btn1', n_clicks=0),
     html.Div(id='container-button-timestamp'),
     # line graph
-    dcc.Graph(figure=fig),
+    #dcc.Graph(figure=fig),
     #dcc.Graph(figure=fig2),
     html.H6("Page load time: {}".format(FOOTER)),
 ])
@@ -334,7 +347,6 @@ app.layout = html.Div(children=[
     Input("Inv", "value"),
     Input("Real", "value"),
     Input("Div", "value"),
-
 )
 def update_output(event,Total, Inv, Real, Div):
     if event == 0:
@@ -343,7 +355,6 @@ def update_output(event,Total, Inv, Real, Div):
         x = '{}, {}, {}, {}'.format(Total, Inv, Real, Div)
         SQLITE_func.EnterData(Total,Inv,Real,Div)
         return "Clicked {} times. {}".format(event, x)
-    
 
 if __name__ == '__main__':
     app.run_server(debug=True)
