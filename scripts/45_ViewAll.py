@@ -32,27 +32,28 @@ def GetLastTable():
     TABLE = cursor.fetchall()
     x = TABLE[0]
     TABLE_NAME = x[0]
-    #TABLE_NAME = "StockData_20210501_02"
     print(TABLE_NAME)
+    return TABLE_NAME
 
-def read_table(var):
-    if var == "Both":
-        var = "IN ('{}','{}')".format("BUY","SELL")
-    else:
-        var = "LIKE '%{}%'".format(var)
-    cmd = "SELECT * FROM {} WHERE {} {}".format(TABLE_NAME,COL,var)
-    global results
+"""
+def read_table():
+    cmd = "SELECT * FROM {} WHERE {}".format(TABLE_NAME,COL)
+    results = cursor.execute(cmd)
+    results = results[0]
+    print(results)
+"""
+
+def read_table(cmd):
     cursor.execute(cmd)
     results = cursor.fetchall()
-    for x in results:
-        #print("{},{},{},{}".format(x[0],x[2],x[7],x[8]))
-        print("{},{},{},{},{},{},{},{},{}".format(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8]))
+    print(results)
 
-def main(VAR):
+def main():
     GetLastTable()
-    read_table(VAR)
+    cmd = "SELECT * FROM {}".format(TABLE_NAME)
+    read_table(cmd)
 
 #VAR = input("Choose to view BUY or SELL (Leave blank for both): ") or "Both"# ask user to enter year
-VAR = "Both"
-main(VAR)
+VAR = "*"
+main()
 #end

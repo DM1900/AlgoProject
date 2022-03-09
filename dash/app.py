@@ -104,6 +104,7 @@ def Get_Stats(choice):
     a_series = pd.Series(to_append, index = df2.columns)
     df2 = df2.append(a_series, ignore_index=True)
 
+#Get_Stats(2022)
 Get_Stats(2021)
 Get_Stats(2020)
 
@@ -155,13 +156,13 @@ def GRAPHTOTAL(var):
     col = "Date"
     cmd = "SELECT * FROM {} WHERE {} LIKE '%{}%'".format(TABLE_NAME,col,var)
     df3 = pd.read_sql(cmd, connection)
-    fig = px.line(df3, x="Date", y="TotalValue")
+    fig = px.line(df3, x="Date", y=['TotalValue','Investment','Realised'])
+    #fig.add_scatter(x=df3['Date'], y=df3['Investment'])
     return fig
+GRAPHYEAR = 2021
+GRAPHTOTAL(GRAPHYEAR)
 
-GRAPHTOTAL(2021)
-
-
-###
+### 
 
 external_stylesheets = 'https://codepen.io/chriddyp/pen/bWLwgP.css'
 #external_stylesheets = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css'
@@ -181,7 +182,7 @@ app.layout = html.Div(children=[
     id='BuySell',
     columns=[{"name": i, "id": i} for i in df0.columns],
     data=df0.to_dict('records'),
-    style_table={
+    style_table={ 
         'overflowX': 'auto',
         'width': '50%'
         },
@@ -281,7 +282,7 @@ app.layout = html.Div(children=[
         },       
         {
             'if': {
-                'filter_query': '{RSI} < 40',
+                'filter_query': '{RSI} < 35',
                 'column_id': 'RSI'
             },
             'color': 'green'
@@ -331,9 +332,10 @@ app.layout = html.Div(children=[
     dcc.Input(id="Real", type="number", placeholder="Total realised"),
     dcc.Input(id="Div", type="number", placeholder="Total dividend"),
     html.Div(id="number-out"),
-    html.Button('Button 1', id='btn1', n_clicks=0),
+    html.Button('Confirm Input', id='btn1', n_clicks=0),
     html.Div(id='container-button-timestamp'),
     # line graph
+    #html.H4(children='Graph for {}'.format(GRAPHYEAR)),
     #dcc.Graph(figure=fig),
     #dcc.Graph(figure=fig2),
     html.H6("Page load time: {}".format(FOOTER)),
@@ -350,11 +352,13 @@ app.layout = html.Div(children=[
 )
 def update_output(event,Total, Inv, Real, Div):
     if event == 0:
-        return "Not Clicked ({})".format(event)
+        #return "Not Clicked ({})".format(event)
+        return ""
     else:
         x = '{}, {}, {}, {}'.format(Total, Inv, Real, Div)
         SQLITE_func.EnterData(Total,Inv,Real,Div)
-        return "Clicked {} times. {}".format(event, x)
+        #return "Clicked {} times. {}".format(event, x)
+        return ""
 
 if __name__ == '__main__':
     app.run_server(debug=True)
