@@ -8,3 +8,4 @@ mkdir -p ./tickers/AV
 
 # to run python requirements:
 # "python -m pip install -r requirements.txt"
+
