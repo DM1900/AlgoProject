@@ -15,5 +15,8 @@ numpy
 # ttkthemes
 
 # Plotly Dash
-dash
-dash-bootstrap-components
+#dash
+#dash-bootstrap-components
+
+# AWS
+boto3

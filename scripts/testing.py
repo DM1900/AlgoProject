@@ -4,29 +4,25 @@
 # Please factor that into any tradng decisions (this is based on Daily RSI so it's not such a big issue here)
 #
 
-# imports:
-from datetime import datetime, timedelta
+print("Test %")
 
-# relative path, it's up to you which one to use:
-RPATH = "."
-RPATH = "/home/admin/AlgoProject"
+def pct_change(first, second):
+    diff = second - first
+    change = 0
+    try:
+        if diff > 0:
+            change = (diff / first) * 100
+        elif diff < 0:
+            diff = first - second
+            change = -((diff / first) * 100)
+    except ZeroDivisionError:
+        return float('inf')
+    return change
+    
 
-# Log variables:
-LOGTIME = datetime.now().strftime("%Y%m%d-%H")
-LOGFILE = "{}/logs/".format(RPATH)
-LOGFILE = LOGFILE + "Log_{}.log".format(LOGTIME)
+CLOSE = 170.1
+PRICE = 174.2
 
-START = datetime.now()
-SCRIPTNAME = "'02_get_data_sqlite.py'"
-
-def LogTest(logfile,msg):
-    msg = "{} {}".format(LOGTIME,msg)
-    f = open(logfile, "a")
-    f.write("""{}
-""".format(msg))
-    f.close()
-TESTLOG = "{}/logs/CronRun01.log".format(RPATH)
-print(TESTLOG)
-LogTest(TESTLOG,"Run confirmation from python script (test)")
-
-exit()
+DIFFV = pct_change(CLOSE,PRICE)
+DIFFV = float(round(DIFFV,2))
+print(DIFFV)

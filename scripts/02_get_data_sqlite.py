@@ -22,10 +22,16 @@ from py_util import AV_func
 from py_util import SQLITE_func
 from py_util import pylog as log
 from vars import *
+# aws dynamodb
+import boto3
+ddbClient = boto3.client('dynamodb', region_name='eu-west-1')
+dynamodb = boto3.resource('dynamodb', region_name='eu-west-1')
+#ddbTable = dynamodb.Table('SD-20220322-01')
+ddbTable = dynamodb.Table('StockData')
 
 # relative path, it's up to you which one to use:
 RPATH = "."
-RPATH = "/home/derek/AlgoProject"
+RPATH = "/home/ec2-user/AlgoProject"
 
 # Log variables:
 LOGTIME = datetime.now().strftime("%Y%m%d-%H")
@@ -45,8 +51,8 @@ TESTTEXT = "{} Run confirmation from python script ('02_get_data_sqlite.py')".fo
 LogTest(LOGFILE,TESTTEXT)
 
 # relative path, it's up to you which one to use:
-RPATH = "."
-RPATH = "/home/derek/AlgoProject"
+#RPATH = "."
+#RPATH = "/home/ec2-user/AlgoProject"
 
 # Log variables:
 LOGTIME = datetime.now().strftime("%Y%m%d-%H")
@@ -81,6 +87,8 @@ SQLITE_func.CreateDB(DB_NAME,TABLE_NAME)
 DDATE = datetime.now().strftime("%d/%m/%Y")
 Date = '"{}"'.format(DDATE)
 DDATE = '"{}"'.format(DDATE)
+DDBDATE = datetime.now().strftime("%Y%m%d")
+DATEV = int(datetime.now().strftime("%Y%m%d"))
 #
 RSI_PERIOD = 14 # no. of days to calculate RSI
 RSI_INT = 'daily' # interval to calculate RSI
@@ -97,8 +105,8 @@ SELL = "SELL"
 #SELLRSI = "SELL (RSI very high)"
 HOLD = "HOLD"
 # how long to wait between API calls (kind of irrelevant due to the way Alpha Vantage limits calls, but anyway...)
-WAITAPI = 7
-WAITERR = 5
+WAITAPI = 10
+WAITERR = 10
 #
 # list of alpha vantage keys
 KEYS = "{}/scripts/keys/keys.txt".format(RPATH)
@@ -116,6 +124,56 @@ with open(tickerlist) as file:
     tickers = [ticker.rstrip('\n') for ticker in file]
 
 #tickers = ['AAPL']
+
+def write_ddb(TICKER,DATE,CHANGE,CLOSE,PRICE,RSI,SUGGESTION):
+    print(TICKER)
+    DATE = str(DATE)
+    print(DATE)
+    CHANGE = str(round(CHANGE,2))
+    print(CHANGE)
+    CLOSE = str(CLOSE)
+    print(CLOSE)
+    PRICE = str(PRICE)
+    print(PRICE)
+    RSI = str(round(RSI,2))
+    print(RSI)
+    print(SUGGESTION)
+    ddbClient.put_item(
+        TableName='StockData',
+        Item={
+            'TICKER': {'S': TICKER },
+            'DATE': {'N': DATE },
+            'CHANGE': {'N': CHANGE },
+            'CLOSE': {'N': CLOSE },
+            'PRICE': {'N': PRICE },
+            'RSI': {'N': RSI },
+            'SUGGESTION': {'S': SUGGESTION }
+        }
+    )
+
+def pct_change(first, second):
+    diff = second - first
+    change = 0
+    try:
+        if diff > 0:
+            change = (diff / first) * 100
+        elif diff < 0:
+            diff = first - second
+            change = -((diff / first) * 100)
+    except ZeroDivisionError:
+        return float('inf')
+    return change
+
+#TICKV = 'AAPL'
+#DATEV = 20220111
+#CHANGEV = "20.01%"
+#CLOSEV = '123.50'
+#PRICEV = '150.25'
+#RSIV = '63.302'
+#SUGV = 'HOLD'
+#write_ddb(TICKV,DATEV,CHANGEV,CLOSEV,PRICEV,RSIV,SUGV)
+
+#exit()
 
 df2 = pd.DataFrame(columns=[])  # create empty dataframe
 
@@ -169,6 +227,7 @@ def get_data(ticker):
                 # suggest buy/sell based on RSI & price action
                 # #def GetSuggestion(RS,DCLOSE,DPRICE,BUY,SELL,HOLD,RSIHIGH,RSIVHIGH,RSILOW,RSIVLOW):
                 SUGGESTION = AV_func.GetSuggestion(RS,DCLOSE,DPRICE,BUY,SELL,HOLD,RSIHIGH,RSIVHIGH,RSILOW,RSIVLOW)
+                DDBSUG = '{}'.format(SUGGESTION)
                 SUGGESTION = '"{}"'.format(SUGGESTION)
                 #log.WriteToLog(LOGFILE,"Suggestion for {}: {}".format(ticker,SUGGESTION))
                 #df2 = df2.append(df)
@@ -183,6 +242,15 @@ def get_data(ticker):
         log.WriteToLog(LOGFILE,INSERT_CMD)
         cursor.execute(INSERT_CMD)
         connection.commit()
+        print("Write to DDB")
+        #write_ddb(DTICKER,DDBDATE,"0",DCLOSE,DPRICE,RSR,SUGGESTION)
+        #write_ddb("AAPL","20220111","10","123","125","65","BUY")
+        #write_ddb(ticker,DDBDATE,"0",DCLOSE,DPRICE,RSR,DDBSUG)
+        CL = float(DCLOSE)
+        PR = float(DPRICE)
+        CHANGEV = pct_change(CL,PR)
+        write_ddb(ticker,DATEV,CHANGEV,DCLOSE,DPRICE,RS,DDBSUG)
+
     except: # catch all exceptions in the same way
         log.WriteToLog(LOGFILE,"Main Error catch {}".format(ticker))
         log.WriteToLog(LOGFILE,"{} - Error found, {}, attempting to continue...".format(ticker, "Main Error catch"))
