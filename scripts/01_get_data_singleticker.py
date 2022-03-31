@@ -16,24 +16,7 @@ RSI_INT = 'daily' # interval to calculate RSI
 
 tickers = ['AML.LON','AAPL']
 #tickers = ['DIS']
-tickers = ['MARA']
-
-def write_ddb():
-    ddbTable.put_item(
-        Item={
-            'TICKER': 'AAPL',
-            'DATE': '20220117',
-            'CHANGE': '19',
-            'CLOSE': '1233',
-            'PRICE': '1255',
-            'RSI': '65',
-            'SUGGESTION': 'BUY'
-        }
-    )
-
-
-
-
+tickers = ['AAPL']
 
 def get_data(ticker):
     APIkey = AV_func.GetAPIkey(KEYS) # get a new API key each time the script runs
@@ -55,9 +38,6 @@ def get_data(ticker):
     df = df.transpose()
     print(df)
     print("---")
-    print(df[0])
-
-
 
 for ticker in tickers:
     get_data(ticker)
